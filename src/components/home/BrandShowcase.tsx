@@ -2,6 +2,10 @@
 
 import { motion } from "framer-motion";
 
+// ---------------------------------------------------------------------------
+// Card configs
+// ---------------------------------------------------------------------------
+
 interface ShowcaseCard {
   label: string;
   tag: string;
@@ -13,7 +17,7 @@ interface ShowcaseCard {
   h: string;
   delay: number;
   accentColor: string;
-  imageUrl: string;
+  imageSrc: string;
 }
 
 const cards: ShowcaseCard[] = [
@@ -28,7 +32,7 @@ const cards: ShowcaseCard[] = [
     h: "280px",
     delay: 0.2,
     accentColor: "#0f766e",
-    imageUrl: "https://placehold.co/440x560/0f766e/ffffff?text=Tote+Bag&font=raleway",
+    imageSrc: "/images/tote-bag.jpg",
   },
   {
     label: "Designer Sneakers",
@@ -41,7 +45,7 @@ const cards: ShowcaseCard[] = [
     h: "240px",
     delay: 0.35,
     accentColor: "#f97316",
-    imageUrl: "https://placehold.co/380x480/f97316/ffffff?text=Sneakers&font=raleway",
+    imageSrc: "/images/sneakers.jpg",
   },
   {
     label: "Silk Dress",
@@ -54,7 +58,7 @@ const cards: ShowcaseCard[] = [
     h: "260px",
     delay: 0.5,
     accentColor: "#ec4899",
-    imageUrl: "https://placehold.co/420x520/ec4899/ffffff?text=Silk+Dress&font=raleway",
+    imageSrc: "/images/dress.jpg",
   },
   {
     label: "Gold Watch",
@@ -67,9 +71,13 @@ const cards: ShowcaseCard[] = [
     h: "200px",
     delay: 0.65,
     accentColor: "#eab308",
-    imageUrl: "https://placehold.co/320x400/eab308/ffffff?text=Gold+Watch&font=raleway",
+    imageSrc: "/images/watch.jpg",
   },
 ];
+
+// ---------------------------------------------------------------------------
+// Card component
+// ---------------------------------------------------------------------------
 
 function Card({ card }: { card: ShowcaseCard }) {
   return (
@@ -88,13 +96,12 @@ function Card({ card }: { card: ShowcaseCard }) {
         className="group relative rounded-2xl shadow-xl border border-white/20 overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:-translate-y-2"
         style={{ width: card.w, height: card.h }}
       >
-        <div
-          className={`absolute inset-0 bg-gradient-to-br ${card.gradient}`}
-        />
+        <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient}`} />
 
-        <div
-          className="absolute inset-3 rounded-xl bg-cover bg-center opacity-90 group-hover:opacity-100 transition-opacity"
-          style={{ backgroundImage: `url(${card.imageUrl})` }}
+        <img
+          src={card.imageSrc}
+          alt={card.label}
+          className="absolute inset-3 w-[calc(100%-1.5rem)] h-[calc(100%-1.5rem)] object-cover rounded-xl"
         />
 
         <div className="absolute top-3 left-3 z-10">
@@ -111,6 +118,10 @@ function Card({ card }: { card: ShowcaseCard }) {
     </motion.div>
   );
 }
+
+// ---------------------------------------------------------------------------
+// BrandShowcase
+// ---------------------------------------------------------------------------
 
 export function BrandShowcase() {
   return (
