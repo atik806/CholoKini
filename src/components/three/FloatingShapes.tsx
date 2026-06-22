@@ -15,12 +15,9 @@ interface ShapeConfig {
 }
 
 const SHAPES: ShapeConfig[] = [
-  { type: "icosahedron", position: [-4, 2, -2], scale: 0.6, color: "#0f766e", speed: 0.5, distort: 0.2 },
-  { type: "torus", position: [4, -1.5, -3], scale: 0.5, color: "#f59e0b", speed: 0.8, distort: 0.3 },
-  { type: "octahedron", position: [-3, -2, -4], scale: 0.4, color: "#14b8a6", speed: 0.6, distort: 0.15 },
-  { type: "dodecahedron", position: [3.5, 2.5, -2.5], scale: 0.45, color: "#0d9488", speed: 0.4, distort: 0.25 },
-  { type: "icosahedron", position: [5, 1, -5], scale: 0.35, color: "#10b981", speed: 0.7, distort: 0.2 },
-  { type: "torus", position: [-5, -1, -4], scale: 0.4, color: "#fbbf24", speed: 0.3, distort: 0.1 },
+  { type: "icosahedron", position: [3.5, 1.8, -2.0], scale: 0.5, color: "#0f766e", speed: 0.5, distort: 0.2 },
+  { type: "torus", position: [4.5, -1.0, -2.5], scale: 0.35, color: "#14b8a6", speed: 0.7, distort: 0.3 },
+  { type: "dodecahedron", position: [2.0, -1.8, -3.0], scale: 0.3, color: "#10b981", speed: 0.4, distort: 0.25 },
 ];
 
 function Shape({ config }: { config: ShapeConfig }) {
@@ -45,7 +42,7 @@ function Shape({ config }: { config: ShapeConfig }) {
           distort={config.distort}
           speed={config.speed * 0.5}
           transparent
-          opacity={0.15}
+          opacity={0.08}
           wireframe
         />
       </mesh>

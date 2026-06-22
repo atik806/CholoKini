@@ -22,15 +22,10 @@ import { getParallax } from "./useParallax";
 type ProductShape = "bottle" | "box" | "bag" | "jar";
 
 interface ProductItemProps {
-  /* Product identifier — swap placeholder by changing this component's internals */
   productId?: string;
-  /* For future use: path to .png cutout or .glb model */
   src?: string;
-  /* How to render — currently only "placeholder", tomorrow also "image" | "model" */
   variant?: "placeholder" | "image" | "model";
-  /* Placeholder shape variant */
   shape?: ProductShape;
-  /* Scene position — optional; inherits from parent group if omitted */
   position?: [number, number, number];
   scale?: number;
   rotation?: [number, number, number];
@@ -42,27 +37,25 @@ interface ProductItemProps {
 function BottlePlaceholder({ color, opacity }: { color: string; opacity: number }) {
   return (
     <group>
-      {/* Body */}
       <mesh position={[0, 0.3, 0]}>
         <cylinderGeometry args={[0.25, 0.3, 0.6, 16]} />
         <meshPhysicalMaterial
           color={color}
           transparent
           opacity={opacity}
-          roughness={0.3}
-          metalness={0.6}
-          clearcoat={0.4}
+          roughness={0.4}
+          metalness={0.3}
+          clearcoat={0.2}
+          envMapIntensity={0.5}
         />
       </mesh>
-      {/* Neck */}
       <mesh position={[0, 0.65, 0]}>
         <cylinderGeometry args={[0.08, 0.12, 0.15, 16]} />
-        <meshPhysicalMaterial color={color} transparent opacity={opacity} roughness={0.4} metalness={0.3} />
+        <meshPhysicalMaterial color={color} transparent opacity={opacity} roughness={0.5} metalness={0.2} />
       </mesh>
-      {/* Cap */}
       <mesh position={[0, 0.78, 0]}>
         <sphereGeometry args={[0.1, 12, 12]} />
-        <meshPhysicalMaterial color="#ffffff" transparent opacity={opacity * 0.9} roughness={0.2} metalness={0.8} />
+        <meshPhysicalMaterial color="#ffffff" transparent opacity={opacity * 0.7} roughness={0.3} metalness={0.4} />
       </mesh>
     </group>
   );
@@ -77,15 +70,18 @@ function BoxPlaceholder({ color, opacity }: { color: string; opacity: number }) 
           color={color}
           transparent
           opacity={opacity}
-          roughness={0.2}
-          metalness={0.7}
-          clearcoat={0.3}
+          roughness={0.15}
+          metalness={0.8}
+          clearcoat={0.6}
+          clearcoatRoughness={0.2}
+          envMapIntensity={1.5}
+          emissive={color}
+          emissiveIntensity={0.08}
         />
       </mesh>
-      {/* Ribbon/strap accent */}
       <mesh position={[0.31, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
         <boxGeometry args={[0.05, 0.65, 0.05]} />
-        <meshPhysicalMaterial color="#ffffff" transparent opacity={opacity * 0.6} roughness={0.5} metalness={0.1} />
+        <meshPhysicalMaterial color="#e2e8f0" transparent opacity={opacity * 0.8} roughness={0.3} metalness={0.2} />
       </mesh>
     </group>
   );
@@ -102,7 +98,6 @@ function BagPlaceholder({ color, opacity }: { color: string; opacity: number }) 
         <cylinderGeometry args={[0.25, 0.28, 0.5, 12]} />
         <meshPhysicalMaterial color={color} transparent opacity={opacity} roughness={0.5} metalness={0.2} />
       </mesh>
-      {/* Handles */}
       <mesh position={[0.15, 0.65, 0]} rotation={[0, 0, 0.3]}>
         <torusGeometry args={[0.08, 0.02, 8, 12, Math.PI]} />
         <meshPhysicalMaterial color="#ffffff" transparent opacity={opacity * 0.5} roughness={0.3} metalness={0.5} />
@@ -118,23 +113,22 @@ function BagPlaceholder({ color, opacity }: { color: string; opacity: number }) 
 function JarPlaceholder({ color, opacity }: { color: string; opacity: number }) {
   return (
     <group>
-      {/* Body */}
       <mesh position={[0, 0.2, 0]}>
         <cylinderGeometry args={[0.35, 0.3, 0.4, 20]} />
         <meshPhysicalMaterial
           color={color}
           transparent
           opacity={opacity}
-          roughness={0.1}
-          metalness={0.3}
-          clearcoat={1}
-          clearcoatRoughness={0.1}
+          roughness={0.3}
+          metalness={0.2}
+          clearcoat={0.3}
+          clearcoatRoughness={0.3}
+          envMapIntensity={0.6}
         />
       </mesh>
-      {/* Lid */}
       <mesh position={[0, 0.45, 0]}>
         <cylinderGeometry args={[0.32, 0.32, 0.08, 20]} />
-        <meshPhysicalMaterial color="#d4d4d4" transparent opacity={opacity * 0.8} roughness={0.3} metalness={0.7} />
+        <meshPhysicalMaterial color="#a1a1aa" transparent opacity={opacity * 0.6} roughness={0.4} metalness={0.3} />
       </mesh>
     </group>
   );
@@ -198,7 +192,7 @@ interface CenterpieceProductProps {
 }
 
 export function CenterpieceProduct({
-  position: basePos = [1.8, 0, 0.5],
+  position: basePos = [2.2, -0.1, 0.8],
   color = "#0f766e",
 }: CenterpieceProductProps) {
   const groupRef = useRef<THREE.Group>(null);
@@ -206,38 +200,39 @@ export function CenterpieceProduct({
 
   useFrame((_, delta) => {
     if (groupRef.current) {
-      const { x, y } = getParallax(1.8);
-      groupRef.current.position.x = baseRef.current[0] + x * 0.5;
-      groupRef.current.position.y = baseRef.current[1] + y * 0.5;
-      groupRef.current.rotation.y += delta * 0.25;
+      const { x, y, scrollY } = getParallax(1.8);
+
+      groupRef.current.position.x = baseRef.current[0] + x * 0.6;
+      groupRef.current.position.y = baseRef.current[1] + y * 0.6;
+      groupRef.current.position.z = baseRef.current[2] + scrollY * 0.008;
+
+      groupRef.current.rotation.y += delta * 0.3;
+      groupRef.current.position.y += Math.sin(Date.now() * 0.0006) * 0.003;
     }
   });
 
   return (
     <group>
-      {/* Contact shadow beneath the centerpiece */}
       <ContactShadows
-        position={[basePos[0], -0.5, basePos[2] ?? 0]}
-        scale={4}
+        position={[basePos[0], -0.6, basePos[2] ?? 0]}
+        scale={5}
         blur={2}
-        opacity={0.3}
-        far={2}
+        opacity={0.5}
+        far={3}
       />
 
-      {/* PLACEHOLDER_PRODUCT_1 — centerpiece hero product
-          To swap: replace <ProductItem> with a real <Image> plane or <GLTF> model */}
       <group
         ref={groupRef}
         position={basePos}
         rotation={[0.05, 0, 0]}
       >
-        <Float speed={0.8} rotationIntensity={0.05} floatIntensity={0.2}>
+        <Float speed={0.6} rotationIntensity={0.03} floatIntensity={0.15}>
           <ProductItem
             productId="centerpiece"
             shape="box"
             color={color}
-            opacity={0.95}
-            scale={1}
+            opacity={1}
+            scale={1.5}
           />
         </Float>
       </group>
@@ -270,29 +265,33 @@ export function SmallFloatingProduct({
 
   useFrame((_, delta) => {
     if (groupRef.current) {
-      const { x, y } = getParallax(1.2);
-      // Independent bob — each product has different phase/speed
-      const bob = Math.sin(Date.now() * 0.001 * bobSpeed + phase) * 0.12;
+      const { x, y, scrollY } = getParallax(1.2);
+
+      // Medium parallax depth
       groupRef.current.position.x = baseRef.current[0] + x * 0.3;
-      groupRef.current.position.y = baseRef.current[1] + y * 0.3 + bob;
-      groupRef.current.position.z = baseRef.current[2] + y * 0.1;
+      groupRef.current.position.y = baseRef.current[1] + y * 0.3;
+      groupRef.current.position.z = baseRef.current[2] + y * 0.1 + scrollY * 0.005;
+
+      // Independent bob — each product has different phase/speed
+      const bob = Math.sin(Date.now() * 0.001 * bobSpeed + phase) * 0.15;
+      groupRef.current.position.y += bob;
 
       // Gentle auto-rotation on a tilted axis
-      groupRef.current.rotation.x += delta * 0.08;
-      groupRef.current.rotation.z += delta * 0.04;
+      groupRef.current.rotation.x += delta * 0.06 + Math.sin(Date.now() * 0.0005 + phase) * 0.002;
+      groupRef.current.rotation.z += delta * 0.03 + Math.cos(Date.now() * 0.0004 + phase) * 0.002;
     }
   });
 
   return (
     /* PLACEHOLDER_PRODUCT_{2|3|4} — small floating product
        To swap: replace <ProductItem> with a real asset component */
-    <group ref={groupRef} scale={0.55}>
-      <Float speed={1.2} rotationIntensity={0.1} floatIntensity={0.15}>
+    <group ref={groupRef} position={basePos} scale={0.5}>
+      <Float speed={1.2} rotationIntensity={0.08} floatIntensity={0.12}>
         <ProductItem
           productId={productId}
           shape={shape}
           color={color}
-          opacity={0.7}
+          opacity={0.5}
           scale={1}
         />
       </Float>

@@ -10,15 +10,12 @@ const SceneContainer = dynamic(
   { ssr: false }
 );
 
-const Hero3DShowcase = dynamic(
-  () => import("@/src/components/three/Hero3DShowcase").then((m) => ({ default: m.Hero3DShowcase })),
+const CollageScene = dynamic(
+  () => import("@/src/components/three/CollageScene").then((m) => ({ default: m.CollageScene })),
   { ssr: false }
 );
 
-const FloatingShapes = dynamic(
-  () => import("@/src/components/three/FloatingShapes").then((m) => ({ default: m.FloatingShapes })),
-  { ssr: false }
-);
+import { MobileProductCollage } from "./MobileProductCollage";
 
 const titleWords = ["Discover", "Premium", "Lifestyle"];
 
@@ -40,8 +37,7 @@ export function HeroSection() {
       />
 
       <SceneContainer className="hidden lg:block">
-        <Hero3DShowcase />
-        <FloatingShapes count={6} />
+        <CollageScene />
       </SceneContainer>
 
       <div className="container relative z-10 py-16 md:py-32">
@@ -124,6 +120,8 @@ export function HeroSection() {
 
           <div className="relative hidden lg:block h-[550px] w-full" />
         </div>
+
+        <MobileProductCollage />
       </div>
     </section>
   );

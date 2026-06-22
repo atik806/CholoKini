@@ -4,7 +4,7 @@ import { useRef, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Float, MeshTransmissionMaterial } from "@react-three/drei";
 import * as THREE from "three";
-import { useParallax, useParallaxUpdater } from "./useParallax";
+import { getParallax, useParallaxUpdater } from "./useParallax";
 import { CenterpieceProduct, SmallFloatingProduct } from "./Products";
 
 // ---------------------------------------------------------------------------
@@ -27,10 +27,10 @@ const PARTICLE_GEOMETRY = generatePositions(200, 12);
 
 function Particles() {
   const particlesRef = useRef<THREE.Points>(null);
-  const { scrollY } = useParallax(0.3);
 
   useFrame((_, delta) => {
     if (particlesRef.current) {
+      const { scrollY } = getParallax(0.3);
       particlesRef.current.rotation.y += delta * 0.02;
       particlesRef.current.rotation.x += scrollY * 0.0001;
     }
@@ -53,14 +53,12 @@ function Particles() {
 // Abstract geometric shapes (back layer — behind products)
 // ---------------------------------------------------------------------------
 const ICOSAHEDRON_POSITIONS: [number, number, number][] = [
-  [2.5, 0.8, 0],
-  [-2.2, -0.5, 0.5],
-  [0, 1.5, -1],
-  [1.8, -1.2, 0.8],
-  [-1.5, 1, -0.5],
+  [2.8, 0.3, 0.5],
+  [3.8, -1.0, 1.2],
+  [1.5, 1.5, -0.3],
 ];
 
-const COLORS = ["#0f766e", "#14b8a6", "#f59e0b", "#0d9488", "#10b981"];
+const COLORS = ["#0f766e", "#14b8a6", "#10b981"];
 
 function FloatingIcosahedron({
   position,
@@ -73,7 +71,7 @@ function FloatingIcosahedron({
 }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
-  const { x, y, scrollY } = useParallax(0.6);
+  const baseRef = useRef(position);
 
   useFrame((_, delta) => {
     if (meshRef.current) {
@@ -81,9 +79,10 @@ function FloatingIcosahedron({
       meshRef.current.rotation.y += delta * 0.3 * (index % 2 === 0 ? -1 : 1);
     }
     if (groupRef.current) {
-      groupRef.current.position.x = position[0] + x * 0.15;
-      groupRef.current.position.y = position[1] + y * 0.15 + scrollY * 0.002;
-      groupRef.current.position.z = position[2] + scrollY * 0.003;
+      const { x, y, scrollY } = getParallax(0.6);
+      groupRef.current.position.x = baseRef.current[0] + x * 0.15;
+      groupRef.current.position.y = baseRef.current[1] + y * 0.15 + scrollY * 0.002;
+      groupRef.current.position.z = baseRef.current[2] + scrollY * 0.003;
     }
   });
 
@@ -95,18 +94,19 @@ function FloatingIcosahedron({
           <MeshTransmissionMaterial
             color={color}
             transparent
-            opacity={0.6}
-            roughness={0.1}
-            metalness={0.9}
-            thickness={0.5}
-            ior={1.5}
-            chromaticAberration={0.1}
+            opacity={0.5}
+            roughness={0.05}
+            metalness={0.95}
+            thickness={1}
+            ior={2}
+            chromaticAberration={0.15}
             backside
+            samples={4}
           />
         </mesh>
-        <mesh scale={[1.15, 1.15, 1.15]}>
+        <mesh scale={[1.2, 1.2, 1.2]}>
           <icosahedronGeometry args={[0.5 + index * 0.08, 0]} />
-          <meshBasicMaterial color={color} transparent opacity={0.08} wireframe />
+          <meshBasicMaterial color={color} transparent opacity={0.15} wireframe />
         </mesh>
       </Float>
     </group>
@@ -171,28 +171,19 @@ function OrbitingRing({ radius, speed, color }: { radius: number; speed: number;
 // ---------------------------------------------------------------------------
 const smallProducts = [
   {
-    // PLACEHOLDER_PRODUCT_2: bottle — right side, slightly behind centerpiece
+    // PLACEHOLDER_PRODUCT_2: bottle — right edge, mid-height
     productId: "floating-bottle",
     shape: "bottle" as const,
-    position: [3.2, -0.2, -0.5] as [number, number, number],
+    position: [3.8, 0.3, 0.5] as [number, number, number],
     color: "#14b8a6",
     phase: 0,
     bobSpeed: 0.5,
   },
   {
-    // PLACEHOLDER_PRODUCT_3: bag — upper right
-    productId: "floating-bag",
-    shape: "bag" as const,
-    position: [1.2, 1.5, -0.8] as [number, number, number],
-    color: "#f59e0b",
-    phase: Math.PI * 0.5,
-    bobSpeed: 0.7,
-  },
-  {
-    // PLACEHOLDER_PRODUCT_4: jar — lower right
+    // PLACEHOLDER_PRODUCT_3: jar — bottom-right, spread from bottle
     productId: "floating-jar",
     shape: "jar" as const,
-    position: [2.8, -1.2, -0.3] as [number, number, number],
+    position: [2.5, -1.5, -0.2] as [number, number, number],
     color: "#0d9488",
     phase: Math.PI,
     bobSpeed: 0.4,
@@ -216,7 +207,6 @@ export function Hero3DShowcase() {
       <Particles />
       <CenterRing />
       <OrbitingRing radius={1.8} speed={0.2} color="#0f766e" />
-      <OrbitingRing radius={2.2} speed={-0.15} color="#f59e0b" />
 
       {/* === LAYER 2: Abstract geometric shapes === */}
       {ICOSAHEDRON_POSITIONS.map((pos, i) => (
@@ -237,7 +227,7 @@ export function Hero3DShowcase() {
       ))}
 
       {/* === LAYER 4: Centerpiece product (front-most == strongest parallax) === */}
-      <CenterpieceProduct position={[1.8, 0, 0.5]} color="#0f766e" />
+      <CenterpieceProduct position={[2.2, -0.1, 0.8]} color="#0f766e" />
     </group>
   );
 }
