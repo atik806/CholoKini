@@ -1,8 +1,19 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
+
+const SceneContainer = dynamic(
+  () => import("@/src/components/three/SceneContainer").then((m) => ({ default: m.SceneContainer })),
+  { ssr: false }
+);
+
+const ParticleField = dynamic(
+  () => import("@/src/components/three/ParticleField").then((m) => ({ default: m.ParticleField })),
+  { ssr: false }
+);
 
 export function PromoBanner() {
   return (
@@ -14,6 +25,15 @@ export function PromoBanner() {
           viewport={{ once: true }}
           className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary-dark to-emerald-800 p-10 md:p-16"
         >
+          <SceneContainer className="opacity-40">
+            <ParticleField
+              count={150}
+              color="#ffffff"
+              size={0.02}
+              opacity={0.3}
+            />
+          </SceneContainer>
+
           <div
             className="absolute inset-0 opacity-10"
             style={{
@@ -40,7 +60,7 @@ export function PromoBanner() {
                 transition={{ delay: 0.1 }}
                 className="font-serif text-3xl md:text-4xl font-bold text-white mb-3"
               >
-                Summer Sale — Up to 40% Off
+                Summer Sale &mdash; Up to 40% Off
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0, y: 10 }}

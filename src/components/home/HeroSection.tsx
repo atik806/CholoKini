@@ -1,41 +1,14 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
-interface FloatingImage {
-  src: string;
-  alt: string;
-  top: string;
-  left: string;
-  rotate: number;
-}
-
-const floatingImages: FloatingImage[] = [
-  {
-    src: "https://picsum.photos/seed/hero-1/400/400",
-    alt: "Product 1",
-    top: "5%",
-    left: "55%",
-    rotate: -8,
-  },
-  {
-    src: "https://picsum.photos/seed/hero-2/400/400",
-    alt: "Product 2",
-    top: "40%",
-    left: "70%",
-    rotate: 5,
-  },
-  {
-    src: "https://picsum.photos/seed/hero-3/400/400",
-    alt: "Product 3",
-    top: "55%",
-    left: "30%",
-    rotate: -5,
-  },
-];
+const SplineScene = dynamic(
+  () => import("@/src/components/three/SplineScene").then((m) => ({ default: m.SplineScene })),
+  { ssr: false }
+);
 
 const titleWords = ["Discover", "Premium", "Lifestyle"];
 
@@ -49,6 +22,8 @@ export function HeroSection() {
             "radial-gradient(circle at 20% 50%, rgba(15, 118, 110, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.06) 0%, transparent 50%)",
         }}
       />
+
+      <SplineScene className="absolute inset-0 hidden lg:block" />
 
       <div className="container relative z-10 py-12 md:py-32">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
@@ -109,40 +84,7 @@ export function HeroSection() {
             </motion.div>
           </div>
 
-          <div className="relative hidden lg:block h-[500px] w-full">
-            {floatingImages.map((img, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 1 + i * 0.2 }}
-                className="absolute"
-                style={{
-                  left: img.left,
-                  top: img.top,
-                  rotate: `${img.rotate}deg`,
-                }}
-              >
-                <motion.div
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{
-                    duration: 4 + i,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  className="w-56 h-56 xl:w-64 xl:h-64 rounded-2xl overflow-hidden shadow-2xl"
-                >
-                  <Image
-                    src={img.src}
-                    alt={img.alt}
-                    fill
-                    className="object-cover"
-                    sizes="256px"
-                  />
-                </motion.div>
-              </motion.div>
-            ))}
-          </div>
+          <div className="relative hidden lg:block h-[500px] w-full" />
         </div>
       </div>
     </section>
