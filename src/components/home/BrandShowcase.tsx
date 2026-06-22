@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 interface ShowcaseCard {
@@ -13,6 +14,7 @@ interface ShowcaseCard {
   h: string;
   delay: number;
   accentColor: string;
+  imageUrl: string;
 }
 
 const cards: ShowcaseCard[] = [
@@ -27,6 +29,7 @@ const cards: ShowcaseCard[] = [
     h: "280px",
     delay: 0.2,
     accentColor: "#0f766e",
+    imageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=500&fit=crop&auto=format",
   },
   {
     label: "Designer Sneakers",
@@ -39,6 +42,7 @@ const cards: ShowcaseCard[] = [
     h: "240px",
     delay: 0.35,
     accentColor: "#f97316",
+    imageUrl: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=500&fit=crop&auto=format",
   },
   {
     label: "Silk Dress",
@@ -51,6 +55,7 @@ const cards: ShowcaseCard[] = [
     h: "260px",
     delay: 0.5,
     accentColor: "#ec4899",
+    imageUrl: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=500&fit=crop&auto=format",
   },
   {
     label: "Gold Watch",
@@ -63,6 +68,7 @@ const cards: ShowcaseCard[] = [
     h: "200px",
     delay: 0.65,
     accentColor: "#eab308",
+    imageUrl: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&h=500&fit=crop&auto=format",
   },
 ];
 
@@ -87,31 +93,23 @@ function Card({ card }: { card: ShowcaseCard }) {
           className={`absolute inset-0 bg-gradient-to-br ${card.gradient}`}
         />
 
-        <div className="absolute inset-3 rounded-xl bg-white/10 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 p-4">
-          <div
-            className="w-3/4 aspect-square rounded-xl flex items-center justify-center"
-            style={{ backgroundColor: `${card.accentColor}33` }}
-          >
-            <svg
-              className="w-8 h-8 text-white/60"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={1.5}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-              />
-            </svg>
-          </div>
-          <span className="text-white/40 text-[10px] uppercase tracking-[0.2em] font-medium">
+        <div className="absolute inset-3 rounded-xl overflow-hidden">
+          <Image
+            src={card.imageUrl}
+            alt={card.label}
+            fill
+            sizes="(max-width: 768px) 50vw, 25vw"
+            className="object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+          />
+        </div>
+
+        <div className="absolute top-3 left-3 z-10">
+          <span className="inline-block px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-[10px] font-medium uppercase tracking-wider border border-white/10">
             {card.tag}
           </span>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/40 to-transparent">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/50 via-black/20 to-transparent z-10">
           <p className="text-white font-semibold text-sm">{card.label}</p>
           <p className="text-white/60 text-xs">CholoKini</p>
         </div>
