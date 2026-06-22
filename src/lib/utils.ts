@@ -28,13 +28,13 @@ export function generateId(): string {
 }
 
 export function getImageUrl(seed: string, w = 600, h = 600): string {
-  return `https://picsum.photos/seed/${seed}/${w}/${h}`;
+  return `https://placehold.co/${w}x${h}?text=${seed}`;
 }
 
 export function getCategoryImage(category: string, index = 1): string {
-  return `https://picsum.photos/seed/${category.toLowerCase().replace(/\s+/g, "-")}-${index}/800/600`;
+  return `https://placehold.co/800x600?text=${category.toLowerCase().replace(/\s+/g, "+")}`;
 }
 
 export function getAvatarUrl(name: string): string {
-  return `https://picsum.photos/seed/${name.replace(/\s+/g, "-").toLowerCase()}/100/100`;
+  return `https://placehold.co/100x100?text=${name.split(" ")[0]}`;
 }

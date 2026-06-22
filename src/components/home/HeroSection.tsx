@@ -1,21 +1,9 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, Shield, Truck, RotateCcw } from "lucide-react";
 import Link from "next/link";
-
-const SceneContainer = dynamic(
-  () => import("@/src/components/three/SceneContainer").then((m) => ({ default: m.SceneContainer })),
-  { ssr: false }
-);
-
-const CollageScene = dynamic(
-  () => import("@/src/components/three/CollageScene").then((m) => ({ default: m.CollageScene })),
-  { ssr: false }
-);
-
-import { MobileProductCollage } from "./MobileProductCollage";
+import { BrandShowcase } from "./BrandShowcase";
 
 const titleWords = ["Discover", "Premium", "Lifestyle"];
 
@@ -35,10 +23,6 @@ export function HeroSection() {
             "radial-gradient(circle at 20% 50%, rgba(15, 118, 110, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.06) 0%, transparent 50%)",
         }}
       />
-
-      <SceneContainer className="hidden lg:block">
-        <CollageScene />
-      </SceneContainer>
 
       <div className="container relative z-10 py-16 md:py-32">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
@@ -118,10 +102,10 @@ export function HeroSection() {
             </motion.div>
           </div>
 
-          <div className="relative hidden lg:block h-[550px] w-full" />
+          <div className="relative hidden lg:block h-[550px] w-full">
+            <BrandShowcase />
+          </div>
         </div>
-
-        <MobileProductCollage />
       </div>
     </section>
   );
