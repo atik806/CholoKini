@@ -1,12 +1,20 @@
 "use client";
 
 import { useEffect } from "react";
+import { ContactShadows } from "@react-three/drei";
 import { useParallaxUpdater } from "./useParallax";
-import { ProductCard } from "./ProductCard";
+import { FloatingProduct } from "./FloatingProduct";
+import {
+  BagModel,
+  ShoeModel,
+  ShirtModel,
+  WatchModel,
+  BottleModel,
+  HeadphoneModel,
+} from "./ProductModels";
 
 interface CardConfig {
-  label: string;
-  productType: "bag" | "shoes" | "shirt" | "watch" | "bottle" | "headphones";
+  model: React.ComponentType<{ color: string; opacity?: number }>;
   color: string;
   position: [number, number, number];
   rotation: [number, number, number];
@@ -18,8 +26,7 @@ interface CardConfig {
 
 const CARDS: CardConfig[] = [
   {
-    label: "Tote Bag",
-    productType: "bag",
+    model: BagModel,
     color: "#0f766e",
     position: [2.0, 0.5, 1.0],
     rotation: [0.05, -0.1, 0.08],
@@ -29,8 +36,7 @@ const CARDS: CardConfig[] = [
     speed: 0.4,
   },
   {
-    label: "Sneakers",
-    productType: "shoes",
+    model: ShoeModel,
     color: "#f97316",
     position: [3.5, -0.3, 0.7],
     rotation: [-0.03, 0.15, -0.05],
@@ -40,8 +46,7 @@ const CARDS: CardConfig[] = [
     speed: 0.6,
   },
   {
-    label: "T-Shirt",
-    productType: "shirt",
+    model: ShirtModel,
     color: "#ec4899",
     position: [1.2, 1.5, 0.2],
     rotation: [0.08, 0.05, -0.1],
@@ -51,8 +56,7 @@ const CARDS: CardConfig[] = [
     speed: 0.5,
   },
   {
-    label: "Watch",
-    productType: "watch",
+    model: WatchModel,
     color: "#eab308",
     position: [4.0, 0.8, -0.1],
     rotation: [-0.05, -0.08, 0.06],
@@ -62,8 +66,7 @@ const CARDS: CardConfig[] = [
     speed: 0.7,
   },
   {
-    label: "Bottle",
-    productType: "bottle",
+    model: BottleModel,
     color: "#14b8a6",
     position: [2.8, -1.3, -0.3],
     rotation: [0.03, -0.12, -0.03],
@@ -73,8 +76,7 @@ const CARDS: CardConfig[] = [
     speed: 0.3,
   },
   {
-    label: "Headphones",
-    productType: "headphones",
+    model: HeadphoneModel,
     color: "#8b5cf6",
     position: [4.8, -0.6, -0.8],
     rotation: [-0.08, 0.1, 0.05],
@@ -95,22 +97,31 @@ export function CollageScene() {
 
   return (
     <group>
-      {CARDS.map((card, i) => (
-        <ProductCard
-          key={i}
-          label={card.label}
-          productType={card.productType}
-          accentColor={card.color}
-          position={card.position}
-          rotation={card.rotation}
-          scale={card.scale}
-          phase={card.phase}
-          bobSpeed={card.speed}
-          parallaxDepth={card.depth}
-          scrollFadeStart={1.5 + card.depth * 0.5}
-          scrollSpreadFactor={card.depth * 0.8}
-        />
-      ))}
+      <ContactShadows
+        position={[3, -0.8, 0]}
+        scale={8}
+        blur={3}
+        opacity={0.3}
+        far={4}
+      />
+      {CARDS.map((card, i) => {
+        const Model = card.model;
+        return (
+          <FloatingProduct
+            key={i}
+            position={card.position}
+            rotation={card.rotation}
+            scale={card.scale}
+            phase={card.phase}
+            bobSpeed={card.speed}
+            parallaxDepth={card.depth}
+            scrollFadeStart={1.5 + card.depth * 0.5}
+            scrollSpreadFactor={card.depth * 0.8}
+          >
+            <Model color={card.color} opacity={card.depth > 0.7 ? 1 : 0.6} />
+          </FloatingProduct>
+        );
+      })}
     </group>
   );
 }
