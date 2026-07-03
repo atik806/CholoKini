@@ -15,12 +15,11 @@ export default function CategoryPage() {
   const category = categories.find((c) => c.slug === categorySlug);
 
   const categoryProducts = useMemo(() => {
+    if (!category) return [];
     return (products as Product[]).filter(
-      (p) =>
-        p.category.toLowerCase().replace(/\s+/g, "-") ===
-        categorySlug.toLowerCase()
+      (p) => p.category === category.name
     );
-  }, [categorySlug]);
+  }, [category]);
 
   if (!category) {
     return (
