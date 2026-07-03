@@ -9,6 +9,7 @@ import { Toaster } from "@/src/components/ui/Toaster";
 import { ToastProvider } from "@/src/providers/ToastProvider";
 import { ThemeProvider } from "@/src/providers/ThemeProvider";
 import { ScrollToTop } from "@/src/components/ui/ScrollToTop";
+import { PageLoader } from "@/src/components/ui/PageLoader";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -40,10 +41,17 @@ export default function RootLayout({
         </Script>
       </head>
       <body className="min-h-dvh flex flex-col bg-white dark:bg-zinc-900 antialiased">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-xl focus:text-sm focus:font-medium"
+        >
+          Skip to main content
+        </a>
         <ThemeProvider>
         <ToastProvider>
+          <PageLoader />
           <Header />
-          <main className="flex-1">{children}</main>
+          <main id="main-content" className="flex-1">{children}</main>
           <Footer />
           <CartDrawer />
           <Toaster />
