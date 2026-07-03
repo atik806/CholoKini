@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Search, X } from "lucide-react";
 import products from "@/src/data/products.json";
 import type { Product } from "@/src/types/product";
@@ -24,6 +24,7 @@ export default function SearchPageWrapper() {
 
 function SearchPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const query = searchParams.get("q") || "";
   const [localQuery, setLocalQuery] = useState(query);
 
@@ -61,8 +62,7 @@ function SearchPage() {
                 const newUrl = localQuery.trim()
                   ? `/search?q=${encodeURIComponent(localQuery.trim())}`
                   : "/search";
-                window.history.pushState({}, "", newUrl);
-                window.location.reload();
+                router.push(newUrl);
               }
             }}
             placeholder="Search products..."
