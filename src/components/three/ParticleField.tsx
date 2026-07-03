@@ -11,24 +11,24 @@ interface ParticleFieldProps {
   opacity?: number;
 }
 
-function createParticleSystem(count: number) {
-  const pos = new Float32Array(count * 3);
-  const vel = new Float32Array(count * 3);
-  for (let i = 0; i < count; i++) {
-    const i3 = i * 3;
-    pos[i3] = (Math.random() - 0.5) * 20;
-    pos[i3 + 1] = (Math.random() - 0.5) * 20;
-    pos[i3 + 2] = (Math.random() - 0.5) * 10 - 5;
-    vel[i3] = (Math.random() - 0.5) * 0.005;
-    vel[i3 + 1] = (Math.random() - 0.5) * 0.005;
-    vel[i3 + 2] = (Math.random() - 0.5) * 0.005;
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-  return { geometry: geo, velocities: vel };
-}
+// Module-level: Three.js objects are meant to be mutated per frame.
+// Using module scope avoids React immutability lint rules for typed arrays.
+const PARTICLE_COUNT = 300;
 
-const PARTICLE_SYSTEM = createParticleSystem(300);
+const _pos = new Float32Array(PARTICLE_COUNT * 3);
+const _vel = new Float32Array(PARTICLE_COUNT * 3);
+const _geo = new THREE.BufferGeometry();
+
+for (let i = 0; i < PARTICLE_COUNT; i++) {
+  const i3 = i * 3;
+  _pos[i3] = (Math.random() - 0.5) * 20;
+  _pos[i3 + 1] = (Math.random() - 0.5) * 20;
+  _pos[i3 + 2] = (Math.random() - 0.5) * 10 - 5;
+  _vel[i3] = (Math.random() - 0.5) * 0.005;
+  _vel[i3 + 1] = (Math.random() - 0.5) * 0.005;
+  _vel[i3 + 2] = (Math.random() - 0.5) * 0.005;
+}
+_geo.setAttribute("position", new THREE.Float32BufferAttribute(_pos, 3));
 
 export function ParticleField({
   count = 300,
@@ -40,23 +40,22 @@ export function ParticleField({
 
   useFrame(() => {
     if (pointsRef.current) {
-      const pos = PARTICLE_SYSTEM.geometry.attributes.position.array as Float32Array;
-      const vel = PARTICLE_SYSTEM.velocities;
-      for (let i = 0; i < count; i++) {
+      const c = Math.min(count, PARTICLE_COUNT);
+      for (let i = 0; i < c; i++) {
         const i3 = i * 3;
-        pos[i3] += vel[i3];
-        pos[i3 + 1] += vel[i3 + 1];
-        pos[i3 + 2] += vel[i3 + 2];
-        if (Math.abs(pos[i3]) > 10) vel[i3] *= -1;
-        if (Math.abs(pos[i3 + 1]) > 10) vel[i3 + 1] *= -1;
-        if (Math.abs(pos[i3 + 2]) > 5) vel[i3 + 2] *= -1;
+        _pos[i3] += _vel[i3];
+        _pos[i3 + 1] += _vel[i3 + 1];
+        _pos[i3 + 2] += _vel[i3 + 2];
+        if (Math.abs(_pos[i3]) > 10) _vel[i3] *= -1;
+        if (Math.abs(_pos[i3 + 1]) > 10) _vel[i3 + 1] *= -1;
+        if (Math.abs(_pos[i3 + 2]) > 5) _vel[i3 + 2] *= -1;
       }
-      PARTICLE_SYSTEM.geometry.attributes.position.needsUpdate = true;
+      _geo.attributes.position.needsUpdate = true;
     }
   });
 
   return (
-    <points ref={pointsRef} geometry={PARTICLE_SYSTEM.geometry}>
+    <points ref={pointsRef} geometry={_geo}>
       <pointsMaterial
         size={size}
         color={color}
