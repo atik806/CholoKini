@@ -109,6 +109,7 @@ export const CartDrawer = memo(function CartDrawer() {
                           fill
                           className="object-cover"
                           sizes="80px"
+                          onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg" }}
                         />
                       </div>
                       <div className="flex-1 min-w-0">
