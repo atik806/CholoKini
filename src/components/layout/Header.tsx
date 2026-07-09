@@ -12,7 +12,7 @@ import {
   Moon,
 } from "lucide-react";
 import Link from "next/link";
-import { useCartStore } from "@/src/store/useCartStore";
+import { useCartStore, useCartHydrated } from "@/src/store/useCartStore";
 import { categories } from "@/src/lib/constants";
 import { MobileNav } from "./MobileNav";
 import { useTheme } from "@/src/providers/ThemeProvider";
@@ -23,6 +23,7 @@ export const Header = memo(function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const cartHydrated = useCartHydrated();
   const totalItems = useCartStore((s) => s.totalItems());
   const searchRef = useRef<HTMLDivElement>(null);
   const { theme, toggleTheme } = useTheme();
@@ -178,7 +179,7 @@ export const Header = memo(function Header() {
               >
                 <ShoppingBag className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
               </motion.div>
-              {totalItems > 0 && (
+              {cartHydrated && totalItems > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 flex items-center justify-center bg-primary text-white text-[10px] font-bold rounded-full shadow-sm">
                   {totalItems}
                 </span>

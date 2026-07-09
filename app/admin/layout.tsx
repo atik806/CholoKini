@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { AdminSidebar } from "@/src/components/admin/AdminSidebar";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+import { API_BASE } from "@/src/lib/constants";
 
 async function validateToken(): Promise<boolean> {
   try {

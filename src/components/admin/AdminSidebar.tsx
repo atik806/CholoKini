@@ -5,8 +5,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Star, Mail, LogOut, ChevronLeft,
-  PanelRightClose, PanelRightOpen,
+  PanelRightClose, PanelRightOpen, Sun, Moon,
 } from "lucide-react";
+import { useTheme } from "@/src/providers/ThemeProvider";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -22,6 +23,7 @@ export function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = () => {
     localStorage.removeItem("admin_session");
@@ -55,7 +57,11 @@ export function AdminSidebar() {
           </Link>
         ))}
       </nav>
-      <div className="p-3 border-t border-zinc-200 dark:border-zinc-700">
+      <div className="p-3 border-t border-zinc-200 dark:border-zinc-700 space-y-1">
+        <button onClick={toggleTheme} className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 w-full transition-colors">
+          {theme === "dark" ? <Sun className="w-5 h-5 shrink-0" /> : <Moon className="w-5 h-5 shrink-0" />}
+          {!collapsed && <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>}
+        </button>
         <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 w-full transition-colors">
           <LogOut className="w-5 h-5 shrink-0" />
           {!collapsed && <span>Logout</span>}

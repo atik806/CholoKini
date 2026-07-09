@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { ShieldAlert } from "lucide-react";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+import { API_BASE } from "@/src/lib/constants";
 
 export default function AdminLoginPage() {
   const router = useRouter();
