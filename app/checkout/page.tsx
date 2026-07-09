@@ -2,33 +2,34 @@
 
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Check, Sparkles, Truck, CreditCard, ClipboardList } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, Sparkles, Truck, ClipboardList, DollarSign, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCartStore } from "@/src/store/useCartStore";
-import { formatPrice, safeImage } from "@/src/lib/utils";
+import { formatPrice as fp, safeImage } from "@/src/lib/utils";
 import { Button } from "@/src/components/ui/Button";
 import { Input } from "@/src/components/ui/Input";
 import { Breadcrumbs } from "@/src/components/ui/Breadcrumbs";
 import { EmptyState } from "@/src/components/ui/EmptyState";
+import { API_BASE } from "@/src/lib/constants";
 
 const steps = [
   { id: "shipping", label: "Shipping", icon: Truck },
-  { id: "payment", label: "Payment", icon: CreditCard },
+  { id: "payment", label: "Payment", icon: DollarSign },
   { id: "review", label: "Review", icon: ClipboardList },
 ];
 
 export default function CheckoutPage() {
   const [step, setStep] = useState(0);
   const [completed, setCompleted] = useState(false);
+  const [placing, setPlacing] = useState(false);
+  const [placeError, setPlaceError] = useState("");
   const { items, clearCart } = useCartStore();
   const [shipping, setShipping] = useState({
     firstName: "", lastName: "", email: "", phone: "",
     address: "", city: "", zipCode: "",
   });
-  const [payment, setPayment] = useState({
-    cardNumber: "", expiry: "", cvc: "", cardholderName: "",
-  });
+  const [payment, setPayment] = useState({ method: "cod" });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validateShipping = useCallback(() => {
@@ -44,17 +45,7 @@ export default function CheckoutPage() {
     return errs;
   }, [shipping]);
 
-  const validatePayment = useCallback(() => {
-    const errs: Record<string, string> = {};
-    if (!payment.cardNumber.trim()) errs.cardNumber = "Required";
-    else if (!/^[\d\s]{13,19}$/.test(payment.cardNumber.trim())) errs.cardNumber = "Invalid card number";
-    if (!payment.expiry.trim()) errs.expiry = "Required";
-    else if (!/^\d{2}\/\d{2}$/.test(payment.expiry.trim())) errs.expiry = "Use MM/YY";
-    if (!payment.cvc.trim()) errs.cvc = "Required";
-    else if (!/^\d{3,4}$/.test(payment.cvc.trim())) errs.cvc = "Invalid CVC";
-    if (!payment.cardholderName.trim()) errs.cardholderName = "Required";
-    return errs;
-  }, [payment]);
+  const validatePayment = useCallback(() => ({} as Record<string, string>), []);
 
   const handleNext = useCallback(() => {
     const errs = step === 0 ? validateShipping() : validatePayment();
@@ -62,10 +53,40 @@ export default function CheckoutPage() {
     if (Object.keys(errs).length === 0) setStep((s) => s + 1);
   }, [step, validateShipping, validatePayment]);
 
-  const handlePlaceOrder = useCallback(() => {
-    clearCart();
-    setCompleted(true);
-  }, [clearCart]);
+  const handlePlaceOrder = useCallback(async () => {
+    setPlacing(true);
+    setPlaceError("");
+    try {
+      const body = {
+        shipping_address: shipping,
+        payment_method: "cod",
+        items: items.map((i) => ({
+          product_id: i.product.id,
+          product_name: i.product.name,
+          product_image: i.product.images?.[0] || null,
+          price: i.product.price,
+          quantity: i.quantity,
+          selected_size: i.selectedSize || null,
+          selected_color: i.selectedColor || null,
+        })),
+      };
+      const res = await fetch(`${API_BASE}/orders/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Failed to place order");
+      }
+      clearCart();
+      setCompleted(true);
+    } catch (e) {
+      setPlaceError(e instanceof Error ? e.message : "Something went wrong");
+    } finally {
+      setPlacing(false);
+    }
+  }, [shipping, items, clearCart]);
 
   if (items.length === 0 && !completed) {
     return (
@@ -211,34 +232,37 @@ export default function CheckoutPage() {
               errors={errors}
             />
           )}
-          {step === 1 && (
-            <PaymentForm
-              values={payment}
-              onChange={setPayment}
-              errors={errors}
-            />
-          )}
+          {step === 1 && <PaymentForm />}
           {step === 2 && <ReviewOrder />}
         </motion.div>
       </AnimatePresence>
 
-      <div className="max-w-lg mx-auto flex items-center justify-between mt-8">
-        {step > 0 ? (
-          <Button variant="outline" onClick={() => { setErrors({}); setStep(step - 1); }}>
-            <ChevronLeft className="w-4 h-4" /> Back
-          </Button>
-        ) : (
-          <div />
+      <div className="max-w-lg mx-auto mt-8 space-y-3">
+        {placeError && (
+          <p className="text-sm text-red-500 text-center">{placeError}</p>
         )}
-        {step < steps.length - 1 ? (
-          <Button onClick={() => handleNext()}>
-            Continue <ChevronRight className="w-4 h-4" />
-          </Button>
-        ) : (
-          <Button onClick={handlePlaceOrder}>
-            Place Order <Sparkles className="w-4 h-4" />
-          </Button>
-        )}
+        <div className="flex items-center justify-between">
+          {step > 0 ? (
+            <Button variant="outline" onClick={() => { setErrors({}); setStep(step - 1); }}>
+              <ChevronLeft className="w-4 h-4" /> Back
+            </Button>
+          ) : (
+            <div />
+          )}
+          {step < steps.length - 1 ? (
+            <Button onClick={() => handleNext()}>
+              Continue <ChevronRight className="w-4 h-4" />
+            </Button>
+          ) : (
+            <Button onClick={handlePlaceOrder} disabled={placing}>
+              {placing ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Placing...</>
+              ) : (
+                <>Place Order <Sparkles className="w-4 h-4" /></>
+              )}
+            </Button>
+          )}
+        </div>
       </div>
     </motion.div>
   );
@@ -273,42 +297,24 @@ function ShippingForm({
 
 const initialState = { firstName: "", lastName: "", email: "", phone: "", address: "", city: "", zipCode: "" };
 
-function PaymentForm({
-  values, onChange, errors,
-}: {
-  values: typeof paymentInitial;
-  onChange: (v: typeof paymentInitial) => void;
-  errors: Record<string, string>;
-}) {
-  const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    onChange({ ...values, [field]: e.target.value });
-  const formatCard = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/\D/g, "").slice(0, 16);
-    const formatted = raw.replace(/(.{4})/g, "$1 ").trim();
-    onChange({ ...values, cardNumber: formatted });
-  };
-  const formatExpiry = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let raw = e.target.value.replace(/\D/g, "").slice(0, 4);
-    if (raw.length >= 2) raw = raw.slice(0, 2) + "/" + raw.slice(2);
-    onChange({ ...values, expiry: raw });
-  };
+function PaymentForm() {
   return (
     <div className="space-y-4">
-      <h2 className="font-serif text-2xl font-bold">Payment Details</h2>
-      <Input label="Card Number" placeholder="4242 4242 4242 4242" value={values.cardNumber} onChange={formatCard} error={errors.cardNumber} />
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <Input label="Expiry Date" placeholder="MM/YY" value={values.expiry} onChange={formatExpiry} error={errors.expiry} />
-        <Input label="CVC" placeholder="123" value={values.cvc} onChange={set("cvc")} error={errors.cvc} />
+      <h2 className="font-serif text-2xl font-bold">Payment Method</h2>
+      <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-6 border border-zinc-200 dark:border-zinc-700">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+            <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <div>
+            <p className="font-semibold text-zinc-900 dark:text-zinc-100">Cash on Delivery</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">Pay when you receive your order</p>
+          </div>
+        </div>
       </div>
-      <Input label="Cardholder Name" placeholder="John Doe" value={values.cardholderName} onChange={set("cardholderName")} error={errors.cardholderName} />
-      <p className="text-xs text-zinc-500 dark:text-zinc-400">
-        This is a demo — no real payment will be processed.
-      </p>
     </div>
   );
 }
-
-const paymentInitial = { cardNumber: "", expiry: "", cvc: "", cardholderName: "" };
 
 function ReviewOrder() {
   const { items, totalPrice } = useCartStore();
@@ -321,7 +327,7 @@ function ReviewOrder() {
             key={item.product.id}
             className="flex items-center gap-3 bg-zinc-50 dark:bg-zinc-800 rounded-xl p-3"
           >
-            <div className="w-14 h-14 rounded-lg overflow-hidden bg-zinc-50 dark:bg-zinc-800 shrink-0">
+            <div className="w-14 h-14 rounded-lg overflow-hidden bg-zinc-50 dark:bg-zinc-800 shrink-0 relative">
                             <Image
                               src={safeImage(item.product.images)}
                               alt={item.product.name}
@@ -337,7 +343,7 @@ function ReviewOrder() {
               <p className="text-xs text-zinc-500 dark:text-zinc-400">Qty: {item.quantity}</p>
             </div>
             <p className="text-sm font-semibold">
-              {formatPrice(item.product.price * item.quantity)}
+              {fp(item.product.price * item.quantity)}
             </p>
           </div>
         ))}
@@ -345,16 +351,16 @@ function ReviewOrder() {
       <div className="border-t border-zinc-200 dark:border-zinc-700 pt-3 space-y-1 text-sm">
         <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
           <span>Subtotal</span>
-          <span>{formatPrice(totalPrice())}</span>
+          <span>{fp(totalPrice())}</span>
         </div>
         <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
           <span>Shipping</span>
-          <span>{totalPrice() >= 50 ? "Free" : "$5.00"}</span>
+          <span>{totalPrice() >= 50 ? "Free" : fp(5)}</span>
         </div>
         <div className="flex justify-between font-semibold text-base pt-1 border-t border-zinc-200 dark:border-zinc-700">
           <span>Total</span>
           <span>
-            {formatPrice(
+            {fp(
               totalPrice() + (totalPrice() >= 50 ? 0 : 5) + totalPrice() * 0.08
             )}
           </span>
