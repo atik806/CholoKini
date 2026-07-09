@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import Image from "next/image";
 import { fetchCategories } from "@/src/lib/api";
 import { CategoryForm, type CategoryFormData } from "@/src/components/admin/CategoryForm";
 import { adminFetcher } from "@/src/lib/admin-api";
@@ -140,7 +141,16 @@ export default function CategoriesPage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         {cat.image && (
-                          <img src={cat.image} alt={cat.name} className="w-10 h-10 rounded-lg object-cover bg-zinc-100 dark:bg-zinc-700" />
+                          <div className="relative w-10 h-10 shrink-0">
+                            <Image
+                              src={cat.image}
+                              alt={cat.name}
+                              fill
+                              className="rounded-lg object-cover"
+                              sizes="40px"
+                              onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }}
+                            />
+                          </div>
                         )}
                         <span className="font-medium">{cat.name}</span>
                       </div>

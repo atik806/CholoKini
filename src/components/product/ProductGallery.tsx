@@ -49,14 +49,18 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
                 : {}
             }
           >
-            <Image
-              src={images[activeIndex]}
-              alt={name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              priority
-            />
+            {images[activeIndex] ? (
+              <Image
+                src={images[activeIndex]}
+                alt={name}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-zinc-400">No image</div>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -72,13 +76,17 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
                 : "border-transparent hover:border-zinc-200 dark:border-zinc-700"
             }`}
           >
-            <Image
-              src={img}
-              alt={`${name} ${i + 1}`}
-              fill
-              className="object-cover"
-              sizes="80px"
-            />
+            {img ? (
+              <Image
+                src={img}
+                alt={`${name} ${i + 1}`}
+                fill
+                className="object-cover"
+                sizes="80px"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-zinc-300 text-xs">N/A</div>
+            )}
           </button>
         ))}
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState, useCallback } from "react";
 import { Canvas } from "@react-three/fiber";
 import { AdaptiveDpr, AdaptiveEvents } from "@react-three/drei";
 
@@ -17,13 +17,33 @@ export function SceneContainer({
   cameraPosition = [0, 0, 6],
   cameraFov = 45,
 }: SceneContainerProps) {
+  const [key, setKey] = useState(0);
+
+  const handleCreated = useCallback((state: { gl: { domElement: HTMLElement } }) => {
+    const canvas = state.gl.domElement;
+    const onContextLost = (e: Event) => {
+      e.preventDefault();
+    };
+    const onContextRestored = () => {
+      setKey((k) => k + 1);
+    };
+    canvas.addEventListener("webglcontextlost", onContextLost);
+    canvas.addEventListener("webglcontextrestored", onContextRestored);
+    return () => {
+      canvas.removeEventListener("webglcontextlost", onContextLost);
+      canvas.removeEventListener("webglcontextrestored", onContextRestored);
+    };
+  }, []);
+
   return (
     <div className={`absolute inset-0 ${className}`}>
       <Canvas
+        key={key}
         camera={{ position: cameraPosition, fov: cameraFov }}
         dpr={[0.75, 2]}
-        gl={{ antialias: true, alpha: true }}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         style={{ background: "transparent" }}
+        onCreated={handleCreated}
       >
         <Suspense fallback={null}>
           <ambientLight intensity={0.4} />

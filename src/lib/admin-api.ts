@@ -125,3 +125,19 @@ export async function fetchAdminReviews(params?: { page?: number; limit?: number
 export async function deleteAdminReview(id: string): Promise<void> {
   await adminFetcher(`/admin/reviews/${id}`, { method: "DELETE" });
 }
+
+// Contact Messages
+export interface ContactMessage {
+  id: string; first_name: string; last_name: string; email: string; subject: string; message: string; is_read: boolean; created_at: string;
+}
+export async function fetchContactMessages(params?: { page?: number; limit?: number }): Promise<{ messages: ContactMessage[]; meta: { total: number; page: number; limit: number; totalPages: number } }> {
+  const qs = new URLSearchParams();
+  if (params?.page) qs.set("page", String(params.page));
+  if (params?.limit) qs.set("limit", String(params.limit));
+  const q = qs.toString();
+  const res = await adminFetcher<ContactMessage[]>(`/admin/contact-messages${q ? `?${q}` : ""}`);
+  return { messages: res.data || [], meta: res.meta! };
+}
+export async function markMessageRead(id: string): Promise<void> {
+  await adminFetcher(`/admin/contact-messages/${id}/read`, { method: "PATCH" });
+}
