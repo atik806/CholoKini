@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+if (!apiUrl) {
+  throw new Error("NEXT_PUBLIC_API_URL must be set before building the frontend");
+}
+
 const apiOrigin = new URL(apiUrl).origin;
 
 const nextConfig: NextConfig = {

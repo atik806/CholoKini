@@ -3,7 +3,13 @@ import type { Category, Testimonial } from "@/src/types/product";
 export const SITE_NAME = "CholoKini";
 export const SITE_DESCRIPTION = "Discover premium products curated for your lifestyle";
 
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+if (!apiUrl) {
+  throw new Error("NEXT_PUBLIC_API_URL must be set to the production backend API URL");
+}
+
+export const API_BASE = apiUrl;
 
 export const categories: Category[] = [
   { id: "electronics", name: "Electronics", slug: "electronics", image: "https://picsum.photos/seed/electronics/800/600", productCount: 8, description: "Cutting-edge gadgets and devices" },
