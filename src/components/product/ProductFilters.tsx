@@ -96,7 +96,7 @@ export function ProductFilters({ filters, onChange, onClose }: ProductFiltersPro
                 onChange={() => toggleCategory(cat.name)}
                 className="w-4 h-4 rounded border-zinc-300 dark:border-zinc-600 text-primary dark:text-primary-light focus:ring-primary/30"
               />
-              <span className="text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:text-zinc-100 transition-colors">
+              <span className="text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">
                 {cat.name}
               </span>
             </label>
@@ -122,7 +122,7 @@ export function ProductFilters({ filters, onChange, onClose }: ProductFiltersPro
                 onChange={() => setPrice(range.value)}
                 className="w-4 h-4 border-zinc-300 dark:border-zinc-600 text-primary dark:text-primary-light focus:ring-primary/30"
               />
-              <span className="text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:text-zinc-100 transition-colors">
+              <span className="text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">
                 {range.label}
               </span>
             </label>
@@ -148,7 +148,7 @@ export function ProductFilters({ filters, onChange, onClose }: ProductFiltersPro
                 onChange={() => setRating(star)}
                 className="w-4 h-4 border-zinc-300 dark:border-zinc-600 text-primary dark:text-primary-light focus:ring-primary/30"
               />
-              <span className="text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:text-zinc-100 transition-colors">
+              <span className="text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">
                 {star}+ Stars
               </span>
             </label>
@@ -161,7 +161,7 @@ export function ProductFilters({ filters, onChange, onClose }: ProductFiltersPro
               onChange={() => setRating(null)}
               className="w-4 h-4 border-zinc-300 dark:border-zinc-600 text-primary dark:text-primary-light focus:ring-primary/30"
             />
-            <span className="text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:text-zinc-100 transition-colors">
+            <span className="text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">
               Any Rating
             </span>
           </label>

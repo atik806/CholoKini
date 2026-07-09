@@ -206,7 +206,7 @@ export default function ProductDetailPage() {
 
           <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-10 pt-8 border-t border-zinc-200 dark:border-zinc-700">
             {[
-              { icon: Truck, label: "Free Shipping", sub: "On orders over $50" },
+              { icon: Truck, label: "Free Shipping", sub: "On orders over ৳50" },
               { icon: Shield, label: "Secure Checkout", sub: "SSL encrypted" },
               { icon: RotateCcw, label: "Easy Returns", sub: "30-day policy" },
             ].map((item) => (

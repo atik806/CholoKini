@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { ToastProvider } from "@/src/providers/ToastProvider";
 import { ThemeProvider } from "@/src/providers/ThemeProvider";
@@ -35,7 +34,6 @@ export default function RootLayout({
       <head>
         <script
           id="theme-init"
-          type="text/javascript"
           dangerouslySetInnerHTML={{ __html: themeScript }}
           suppressHydrationWarning
         />

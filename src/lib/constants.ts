@@ -3,6 +3,8 @@ import type { Category, Testimonial } from "@/src/types/product";
 export const SITE_NAME = "CholoKini";
 export const SITE_DESCRIPTION = "Discover premium products curated for your lifestyle";
 
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
 export const categories: Category[] = [
   { id: "electronics", name: "Electronics", slug: "electronics", image: "https://picsum.photos/seed/electronics/800/600", productCount: 8, description: "Cutting-edge gadgets and devices" },
   { id: "fashion", name: "Fashion", slug: "fashion", image: "https://picsum.photos/seed/fashion/800/600", productCount: 8, description: "Trendsetting apparel and accessories" },
@@ -31,8 +33,8 @@ export const sortOptions = [
 export const priceRanges = [
   { value: "all", label: "All Prices" },
   { value: "0-25", label: "Under $25" },
-  { value: "25-50", label: "$25 - $50" },
-  { value: "50-100", label: "$50 - $100" },
-  { value: "100-200", label: "$100 - $200" },
-  { value: "200-99999", label: "Over $200" },
+  { value: "25-50", label: "৳25 - ৳50" },
+  { value: "50-100", label: "৳50 - ৳100" },
+  { value: "100-200", label: "৳100 - ৳200" },
+  { value: "200-99999", label: "Over ৳200" },
 ];

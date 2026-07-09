@@ -8,7 +8,7 @@ import { BrandShowcase } from "./BrandShowcase";
 const titleWords = ["Discover", "Premium", "Lifestyle"];
 
 const features = [
-  { icon: Truck, label: "Free Shipping", sub: "Orders over $50" },
+  { icon: Truck, label: "Free Shipping", sub: "Orders over ৳50" },
   { icon: Shield, label: "Secure Checkout", sub: "100% protected" },
   { icon: RotateCcw, label: "Easy Returns", sub: "30-day policy" },
 ];

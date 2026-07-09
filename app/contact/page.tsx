@@ -6,7 +6,7 @@ import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from "lucide-react";
 import { Breadcrumbs } from "@/src/components/ui/Breadcrumbs";
 import { Button } from "@/src/components/ui/Button";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+import { API_BASE } from "@/src/lib/constants";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ first_name: "", last_name: "", email: "", subject: "", message: "" });
