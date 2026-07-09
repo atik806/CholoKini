@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, XCircle, Info, X } from "lucide-react";
 import { useToast } from "@/src/providers/ToastProvider";
@@ -22,7 +23,7 @@ const iconColors = {
   info: "text-blue-500 dark:text-blue-400",
 };
 
-export function Toaster() {
+export const Toaster = memo(function Toaster() {
   const { toasts, removeToast } = useToast();
 
   return (
@@ -51,4 +52,4 @@ export function Toaster() {
       </AnimatePresence>
     </div>
   );
-}
+});

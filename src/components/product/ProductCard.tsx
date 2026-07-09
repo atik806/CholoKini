@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, memo } from "react";
 import { motion } from "framer-motion";
 import { Heart, ShoppingBag } from "lucide-react";
 import Image from "next/image";
@@ -18,10 +18,12 @@ interface ProductCardProps {
   index?: number;
 }
 
-export function ProductCard({ product, index = 0 }: ProductCardProps) {
-  const { addItem, toggleWishlist, isInWishlist } = useCartStore();
+export const ProductCard = memo(function ProductCard({ product, index = 0 }: ProductCardProps) {
+  const addItem = useCartStore((s) => s.addItem);
+  const toggleWishlist = useCartStore((s) => s.toggleWishlist);
+  const wishlistIds = useCartStore((s) => s.wishlistIds);
   const { addToast } = useToast();
-  const wishlisted = isInWishlist(product.id);
+  const wishlisted = wishlistIds.includes(product.id);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -131,4 +133,4 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
       </TiltCard>
     </motion.div>
   );
-}
+});

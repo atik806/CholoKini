@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 
-export function ScrollToTop() {
+export const ScrollToTop = memo(function ScrollToTop() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -30,4 +30,4 @@ export function ScrollToTop() {
       )}
     </AnimatePresence>
   );
-}
+});

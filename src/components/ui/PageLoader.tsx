@@ -1,10 +1,10 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export function PageLoader() {
+export const PageLoader = memo(function PageLoader() {
   const pathname = usePathname();
   const prevPath = useRef(pathname);
   const [loading, setLoading] = useState(false);
@@ -34,4 +34,4 @@ export function PageLoader() {
       )}
     </AnimatePresence>
   );
-}
+});

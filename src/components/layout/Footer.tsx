@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { memo } from "react";
 import {
   Globe,
   MessageCircle,
@@ -13,7 +14,7 @@ import {
 import Link from "next/link";
 import { categories } from "@/src/lib/constants";
 
-export function Footer() {
+export const Footer = memo(function Footer() {
   return (
     <footer className="bg-zinc-900 dark:bg-black text-zinc-300 dark:text-zinc-400">
       <div className="container py-16 md:py-20">
@@ -63,18 +64,22 @@ export function Footer() {
           <div>
             <h4 className="text-white font-semibold text-sm mb-5">Support</h4>
             <ul className="space-y-3">
-              {["Contact Us", "Shipping & Returns", "FAQ", "Size Guide", "Privacy Policy"].map(
-                (item) => (
-                  <li key={item}>
-                    <Link
-                      href="/shop"
-                      className="text-sm text-zinc-400 dark:text-zinc-500 hover:text-white transition-colors"
-                    >
-                      {item}
-                    </Link>
-                  </li>
-                )
-              )}
+              {[
+                { label: "Contact Us", href: "/contact" },
+                { label: "Shipping & Returns", href: "/shipping-returns" },
+                { label: "FAQ", href: "/faq" },
+                { label: "Size Guide", href: "/size-guide" },
+                { label: "Privacy Policy", href: "/privacy-policy" },
+              ].map(({ label, href }) => (
+                <li key={label}>
+                  <Link
+                    href={href}
+                    className="text-sm text-zinc-400 dark:text-zinc-500 hover:text-white transition-colors"
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -118,4 +123,4 @@ export function Footer() {
       </div>
     </footer>
   );
-}
+});

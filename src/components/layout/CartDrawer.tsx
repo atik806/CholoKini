@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShoppingBag, Plus, Minus, Trash2 } from "lucide-react";
 import Image from "next/image";
@@ -8,10 +8,14 @@ import Link from "next/link";
 import { useCartStore } from "@/src/store/useCartStore";
 import { formatPrice, safeImage } from "@/src/lib/utils";
 
-export function CartDrawer() {
+export const CartDrawer = memo(function CartDrawer() {
   const [open, setOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
-  const { items, removeItem, updateQuantity, totalPrice, totalItems } = useCartStore();
+  const items = useCartStore((s) => s.items);
+  const removeItem = useCartStore((s) => s.removeItem);
+  const updateQuantity = useCartStore((s) => s.updateQuantity);
+  const totalPrice = useCartStore((s) => s.totalPrice);
+  const totalItems = useCartStore((s) => s.totalItems);
 
   useEffect(() => {
     const handler = () => setOpen(true);
@@ -184,4 +188,4 @@ export function CartDrawer() {
       </AnimatePresence>
     </>
   );
-}
+});

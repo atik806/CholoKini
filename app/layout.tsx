@@ -1,15 +1,10 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
-import { Header } from "@/src/components/layout/Header";
-import { Footer } from "@/src/components/layout/Footer";
-import { CartDrawer } from "@/src/components/layout/CartDrawer";
-import { Toaster } from "@/src/components/ui/Toaster";
 import { ToastProvider } from "@/src/providers/ToastProvider";
 import { ThemeProvider } from "@/src/providers/ThemeProvider";
-import { ScrollToTop } from "@/src/components/ui/ScrollToTop";
-import { PageLoader } from "@/src/components/ui/PageLoader";
-import { InlineScript } from "@/src/components/ui/InlineScript";
+import { RootClient } from "@/src/components/layout/RootClient";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -28,6 +23,8 @@ export const metadata: Metadata = {
   description: "Discover premium products curated for your lifestyle",
 };
 
+const themeScript = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}else if(t==='light'){document.documentElement.classList.remove('dark')}}catch(e){}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -36,8 +33,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <head>
-        <InlineScript
-          html={`(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}else if(t==='light'){document.documentElement.classList.remove('dark')}}catch(e){}})();`}
+        <script
+          id="theme-init"
+          type="text/javascript"
+          dangerouslySetInnerHTML={{ __html: themeScript }}
+          suppressHydrationWarning
         />
       </head>
       <body className="min-h-dvh flex flex-col bg-white dark:bg-zinc-900 antialiased">
@@ -49,13 +49,7 @@ export default function RootLayout({
         </a>
         <ThemeProvider>
         <ToastProvider>
-          <PageLoader />
-          <Header />
-          <main id="main-content" className="flex-1">{children}</main>
-          <Footer />
-          <CartDrawer />
-          <Toaster />
-          <ScrollToTop />
+          <RootClient>{children}</RootClient>
         </ToastProvider>
         </ThemeProvider>
       </body>

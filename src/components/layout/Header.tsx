@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -17,7 +17,7 @@ import { categories } from "@/src/lib/constants";
 import { MobileNav } from "./MobileNav";
 import { useTheme } from "@/src/providers/ThemeProvider";
 
-export function Header() {
+export const Header = memo(function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -199,4 +199,4 @@ export function Header() {
       <MobileNav open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
     </>
   );
-}
+});
