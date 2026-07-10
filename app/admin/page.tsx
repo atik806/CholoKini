@@ -69,9 +69,9 @@ export default function AdminDashboard() {
               <p className="text-sm text-zinc-500 dark:text-zinc-400">No orders yet</p>
             ) : (
               (data?.recentOrders ?? []).map((order) => { const o = order as Record<string, unknown>; return (
-                <div key={o.id as string} className="flex items-center justify-between py-2 border-b border-zinc-100 dark:border-zinc-700/50 last:border-0">
+                <div key={String(o.id ?? "")} className="flex items-center justify-between py-2 border-b border-zinc-100 dark:border-zinc-700/50 last:border-0">
                   <div>
-                    <p className="text-sm font-medium">#{String(o.id).slice(0, 8)}</p>
+                    <p className="text-sm font-medium">#{String(o.id ?? "").slice(0, 8)}</p>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">{formatDate(o.created_at as string)}</p>
                   </div>
                   <div className="text-right">
@@ -101,12 +101,12 @@ export default function AdminDashboard() {
               <p className="text-sm text-zinc-500 dark:text-zinc-400">All products are well stocked</p>
             ) : (
               (data?.lowStockProducts ?? []).map((product) => { const p = product as Record<string, unknown>; return (
-                <div key={p.id as string} className="flex items-center justify-between py-2 border-b border-zinc-100 dark:border-zinc-700/50 last:border-0">
+                <div key={String(p.id ?? "")} className="flex items-center justify-between py-2 border-b border-zinc-100 dark:border-zinc-700/50 last:border-0">
                   <div className="flex items-center gap-3">
                     <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
                     <div>
-                      <p className="text-sm font-medium">{p.name as string}</p>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 capitalize">{p.stock as string}</p>
+                      <p className="text-sm font-medium">{String(p.name ?? "")}</p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 capitalize">{String(p.stock ?? "")}</p>
                     </div>
                   </div>
                   <p className="text-sm font-medium">{formatPrice(p.price as number)}</p>

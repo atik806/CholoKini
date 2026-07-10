@@ -2,7 +2,8 @@ export function cn(...inputs: (string | false | null | undefined)[]) {
   return inputs.filter(Boolean).join(" ");
 }
 
-export function formatPrice(price: number): string {
+export function formatPrice(price: number | null | undefined): string {
+  if (price == null || isNaN(price)) return "৳0";
   return new Intl.NumberFormat("en-BD", {
     style: "currency",
     currency: "BDT",
@@ -11,12 +12,15 @@ export function formatPrice(price: number): string {
   }).format(price);
 }
 
-export function formatDate(date: string): string {
+export function formatDate(date: string | null | undefined): string {
+  if (!date) return "—";
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return "—";
   return new Intl.DateTimeFormat("en-US", {
     month: "long",
     day: "numeric",
     year: "numeric",
-  }).format(new Date(date));
+  }).format(d);
 }
 
 export function slugify(text: string): string {
