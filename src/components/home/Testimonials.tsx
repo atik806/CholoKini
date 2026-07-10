@@ -25,7 +25,7 @@ export function Testimonials() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="flex items-end justify-between mb-12"
+          className="flex items-end justify-between mb-8 md:mb-12"
         >
           <div>
             <span className="text-xs font-semibold uppercase tracking-widest text-primary dark:text-primary-light mb-2 block">

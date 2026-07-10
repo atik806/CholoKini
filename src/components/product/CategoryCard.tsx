@@ -35,14 +35,14 @@ export const CategoryCard = memo(function CategoryCard({ category, index = 0 }: 
             onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg" }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-6">
+          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
             <h3 className="text-white font-serif text-xl font-bold mb-1">
               {category.name}
             </h3>
             <p className="text-white/70 text-sm mb-3">
               {category.productCount} Products
             </p>
-            <span className="inline-flex items-center gap-1.5 text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <span className="inline-flex items-center gap-1.5 text-white text-sm font-medium opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
               Explore <ArrowRight className="w-4 h-4" />
             </span>
           </div>

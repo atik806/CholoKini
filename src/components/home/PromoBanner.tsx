@@ -23,7 +23,7 @@ export function PromoBanner() {
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary-dark to-emerald-800 p-10 md:p-16"
+          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary-dark to-emerald-800 p-6 md:p-10 lg:p-16"
         >
           <SceneContainer className="opacity-40">
             <ParticleField count={150} color="#ffffff" size={0.02} opacity={0.3} />

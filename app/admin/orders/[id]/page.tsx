@@ -245,15 +245,15 @@ export default function OrderDetailPage() {
         Back to Orders
       </button>
 
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="font-serif text-2xl font-bold">Order #{order.id.slice(0, 8)}</h1>
+          <h1 className="font-serif text-xl sm:text-2xl font-bold">Order #{order.id.slice(0, 8)}</h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">{formatDate(order.created_at)}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={handleDownloadReceipt}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors"
           >
             <Download className="w-4 h-4" />
             Receipt
@@ -267,22 +267,22 @@ export default function OrderDetailPage() {
       {order.status !== "cancelled" ? (
         <div className="bg-white dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-700 p-6 mb-6">
           <h2 className="text-sm font-semibold mb-4">Order Progress</h2>
-          <div className="flex items-center">
+          <div className="flex items-center overflow-x-auto -mx-2 px-2">
             {statusSteps.map((step, i) => {
               const isCompleted = currentStepIndex >= i;
               const isCurrent = currentStepIndex === i;
               return (
-                <div key={step} className="flex items-center flex-1 last:flex-none">
-                  <div className="flex items-center gap-2">
+                <div key={step} className="flex items-center flex-1 last:flex-none min-w-[60px]">
+                  <div className="flex items-center gap-1.5">
                     <div className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors",
+                      "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors shrink-0",
                       isCompleted ? "bg-primary text-white" : "bg-zinc-100 dark:bg-zinc-700 text-zinc-400 dark:text-zinc-500",
                       isCurrent && "ring-2 ring-primary/30"
                     )}>
-                      {isCompleted && i < currentStepIndex ? <Check className="w-4 h-4" /> : i + 1}
+                      {isCompleted && i < currentStepIndex ? <Check className="w-3.5 h-3.5" /> : i + 1}
                     </div>
                     <span className={cn(
-                      "text-sm font-medium capitalize",
+                      "text-xs font-medium capitalize hidden sm:inline",
                       isCompleted ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-400 dark:text-zinc-500"
                     )}>
                       {step}
@@ -290,7 +290,7 @@ export default function OrderDetailPage() {
                   </div>
                   {i < statusSteps.length - 1 && (
                     <div className={cn(
-                      "flex-1 h-0.5 mx-3",
+                      "flex-1 h-0.5 mx-2 min-w-[12px]",
                       isCompleted ? "bg-primary" : "bg-zinc-200 dark:bg-zinc-700"
                     )} />
                   )}

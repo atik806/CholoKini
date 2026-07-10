@@ -118,6 +118,13 @@ function ShopPage() {
     [updateParams]
   );
 
+  useEffect(() => {
+    if (mobileFilterOpen) {
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = ""; };
+    }
+  }, [mobileFilterOpen]);
+
   const totalPages = data?.totalPages || 0;
   const safePage = Math.min(page, Math.max(totalPages, 1));
   const products = data?.products || [];

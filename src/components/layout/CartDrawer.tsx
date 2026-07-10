@@ -28,6 +28,7 @@ export const CartDrawer = memo(function CartDrawer() {
 
   useEffect(() => {
     if (!open) return;
+    document.body.style.overflow = "hidden";
     const prev = document.activeElement as HTMLElement;
     const focusable = drawerRef.current?.querySelectorAll<HTMLElement>(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -46,6 +47,7 @@ export const CartDrawer = memo(function CartDrawer() {
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
       prev?.focus();
     };
   }, [open]);
@@ -136,7 +138,7 @@ export const CartDrawer = memo(function CartDrawer() {
                                 item.selectedColor
                               )
                             }
-                            className="w-7 h-7 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                            className="w-8 h-8 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                           >
                             <Minus className="w-3 h-3" />
                           </button>
@@ -152,7 +154,7 @@ export const CartDrawer = memo(function CartDrawer() {
                                 item.selectedColor
                               )
                             }
-                            className="w-7 h-7 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                            className="w-8 h-8 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                           >
                             <Plus className="w-3 h-3" />
                           </button>
@@ -160,7 +162,7 @@ export const CartDrawer = memo(function CartDrawer() {
                       </div>
                       <button
                         onClick={() => removeItem(item.product.id, item.selectedSize, item.selectedColor)}
-                        className="p-1 self-start rounded-lg hover:bg-danger/10 text-zinc-500 dark:text-zinc-400 hover:text-danger transition-colors"
+                        className="p-2 self-start rounded-lg hover:bg-danger/10 text-zinc-500 dark:text-zinc-400 hover:text-danger transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

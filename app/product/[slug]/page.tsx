@@ -69,7 +69,6 @@ export default function ProductDetailPage() {
       selectedColor,
     });
     addToast(`${product.name} added to cart`, "success");
-    window.dispatchEvent(new CustomEvent("open-cart"));
   };
 
   const badge = product.isNew
@@ -95,7 +94,7 @@ export default function ProductDetailPage() {
         ]}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 mb-20">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 mb-20 pb-24 lg:pb-0">
         <ProductGallery images={product.images} name={product.name} />
 
         <div className="flex flex-col">
@@ -190,13 +189,13 @@ export default function ProductDetailPage() {
           </div>
 
           <div className="flex items-center gap-3 mt-8">
-            <Button size="lg" className="flex-1" onClick={handleAdd}>
-              <ShoppingBag className="w-5 h-5" /> Add to Cart
-            </Button>
-            <button
-              onClick={() => toggleWishlist(product.id)}
-              className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-700 flex items-center justify-center hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-            >
+                <Button size="lg" className="flex-1 min-h-[48px]" onClick={handleAdd}>
+                  <ShoppingBag className="w-5 h-5" /> Add to Cart
+                </Button>
+                <button
+                  onClick={() => toggleWishlist(product.id)}
+                  className="w-12 h-12 shrink-0 rounded-xl border border-zinc-200 dark:border-zinc-700 flex items-center justify-center hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                >
               <Heart
                 className={`w-5 h-5 ${
                   wishlisted ? "fill-red-500 dark:fill-red-400 text-red-500 dark:text-red-400" : ""
@@ -249,7 +248,7 @@ export default function ProductDetailPage() {
             )}
           </div>
         </div>
-        <Button size="lg" className="flex-1" onClick={handleAdd}>
+        <Button size="lg" className="flex-1 min-h-[48px]" onClick={handleAdd}>
           <ShoppingBag className="w-5 h-5" /> Add to Cart
         </Button>
       </motion.div>

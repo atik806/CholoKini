@@ -18,6 +18,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
 
   useEffect(() => {
     if (!open) return;
+    document.body.style.overflow = "hidden";
     const prev = document.activeElement as HTMLElement;
     const focusable = navRef.current?.querySelectorAll<HTMLElement>(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -37,6 +38,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
       prev?.focus();
     };
   }, [open, onClose]);
@@ -89,7 +91,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
                     key={cat.id}
                     href={`/shop/${cat.slug}`}
                     onClick={onClose}
-                    className="block px-4 py-2.5 rounded-xl text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                    className="block px-4 py-2.5 rounded-xl text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                   >
                     {cat.name}
                   </Link>
@@ -119,7 +121,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
               <hr className="my-3 border-zinc-200 dark:border-zinc-700" />
               <button
                 onClick={toggleTheme}
-                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors min-h-[44px]"
               >
                 {theme === "dark" ? (
                   <Sun className="w-4 h-4" />

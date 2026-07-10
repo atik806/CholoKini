@@ -35,7 +35,6 @@ export const ProductCard = memo(function ProductCard({ product, index = 0 }: Pro
       selectedColor: product.variants?.colors?.[0]?.name,
     });
     addToast(`${product.name} added to cart`, "success");
-    window.dispatchEvent(new CustomEvent("open-cart"));
   };
 
   const handleWishlist = (e: React.MouseEvent) => {
@@ -86,7 +85,7 @@ export const ProductCard = memo(function ProductCard({ product, index = 0 }: Pro
 
             <button
               onClick={handleWishlist}
-              className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 shadow-sm hover:bg-white dark:bg-zinc-800"
+              className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 shadow-sm hover:bg-white dark:bg-zinc-800"
             >
               <Heart
                 className={`w-4 h-4 transition-colors ${
@@ -101,7 +100,7 @@ export const ProductCard = memo(function ProductCard({ product, index = 0 }: Pro
             >
               <button
                 onClick={handleAddToCart}
-                className="w-full flex items-center justify-center gap-2 bg-primary text-white rounded-xl py-2.5 text-sm font-medium hover:bg-primary-dark transition-colors shadow-lg"
+                className="w-full flex items-center justify-center gap-2 bg-primary text-white rounded-xl py-3 text-sm font-medium hover:bg-primary-dark transition-colors shadow-lg min-h-[44px]"
               >
                 <ShoppingBag className="w-4 h-4" />
                 Add to Cart

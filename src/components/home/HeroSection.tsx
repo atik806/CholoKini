@@ -15,7 +15,7 @@ const features = [
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-amber-50 dark:from-emerald-950/30 dark:via-zinc-900 dark:to-amber-950/30">
+    <section className="relative min-h-[60vh] md:min-h-[80vh] lg:min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-amber-50 dark:from-emerald-950/30 dark:via-zinc-900 dark:to-amber-950/30">
       <div
         className="absolute inset-0 opacity-30"
         style={{
@@ -37,7 +37,7 @@ export function HeroSection() {
               New Collection Available
             </motion.div>
 
-            <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1.1] tracking-tight mb-6 text-zinc-900 dark:text-zinc-100">
+            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.1] tracking-tight mb-6 text-zinc-900 dark:text-zinc-100">
               {titleWords.map((word, i) => (
                 <motion.span
                   key={word}
@@ -56,7 +56,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.7 }}
-              className="text-lg text-zinc-500 dark:text-zinc-400 max-w-lg mb-8 leading-relaxed"
+              className="text-base md:text-lg text-zinc-500 dark:text-zinc-400 max-w-lg mb-8 leading-relaxed"
             >
               Curated collections of the finest products from around the
               world. Quality you can see, feel, and trust.
@@ -66,7 +66,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.9 }}
-              className="flex flex-wrap items-center gap-3 mb-12"
+               className="flex flex-wrap items-center gap-3 mb-8 md:mb-12"
             >
               <Link
                 href="/shop"

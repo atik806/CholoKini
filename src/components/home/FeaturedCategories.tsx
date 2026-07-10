@@ -15,7 +15,7 @@ export function FeaturedCategories() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="flex items-end justify-between mb-12"
+          className="flex items-end justify-between mb-8 md:mb-12"
         >
           <div>
             <span className="text-xs font-semibold uppercase tracking-widest text-primary dark:text-primary-light mb-2 block">
@@ -36,8 +36,8 @@ export function FeaturedCategories() {
           </Link>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-          {categories.slice(0, 6).map((cat, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {categories.slice(0, 4).map((cat, i) => (
             <CategoryCard key={cat.id} category={cat} index={i} />
           ))}
         </div>

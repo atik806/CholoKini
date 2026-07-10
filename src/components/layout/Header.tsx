@@ -136,7 +136,7 @@ export const Header = memo(function Header() {
                     initial={{ opacity: 0, y: 8, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                    className="absolute top-full right-0 mt-2 w-72 sm:w-80 bg-white dark:bg-zinc-800 rounded-xl shadow-xl border border-zinc-200 dark:border-zinc-700 p-2"
+                    className="absolute top-full right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-80 bg-white dark:bg-zinc-800 rounded-xl shadow-xl border border-zinc-200 dark:border-zinc-700 p-2"
                   >
                     <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800 rounded-lg px-3">
                       <Search className="w-4 h-4 text-zinc-500 dark:text-zinc-400 shrink-0" />

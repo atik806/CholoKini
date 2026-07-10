@@ -97,7 +97,7 @@ export default function CartPage() {
               <div className="flex flex-col items-end justify-between">
                 <button
                   onClick={() => removeItem(item.product.id, item.selectedSize, item.selectedColor)}
-                  className="p-1.5 rounded-lg hover:bg-danger/10 text-zinc-500 dark:text-zinc-400 hover:text-danger transition-colors"
+                  className="p-2 rounded-lg hover:bg-danger/10 text-zinc-500 dark:text-zinc-400 hover:text-danger transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>

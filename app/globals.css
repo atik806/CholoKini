@@ -30,6 +30,7 @@
   }
   body {
     @apply bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-sans;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
   html.theme-transition,
   html.theme-transition *,

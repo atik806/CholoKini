@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
 interface TiltCardProps {
@@ -21,6 +21,7 @@ export function TiltCard({
   glare = true,
 }: TiltCardProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const [isTouch, setIsTouch] = useState(false);
   const [glareX, setGlareX] = useState(50);
   const [glareY, setGlareY] = useState(50);
 
@@ -30,8 +31,9 @@ export function TiltCard({
   const springX = useSpring(x, { stiffness: 200, damping: 20 });
   const springY = useSpring(y, { stiffness: 200, damping: 20 });
 
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => {
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (isTouch) return;
       const el = ref.current;
       if (!el) return;
 
@@ -52,10 +54,10 @@ export function TiltCard({
         setGlareY((mouseY / height) * 100);
       }
     },
-    [tiltDegree, x, y, glare]
+    [tiltDegree, x, y, glare, isTouch]
   );
 
-  const handleMouseLeave = useCallback(() => {
+  const handlePointerLeave = useCallback(() => {
     x.set(0);
     y.set(0);
     if (glare) {
@@ -64,15 +66,19 @@ export function TiltCard({
     }
   }, [x, y, glare]);
 
+  useEffect(() => {
+    setIsTouch("ontouchstart" in window || navigator.maxTouchPoints > 0);
+  }, []);
+
   return (
     <motion.div
       ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={handlePointerLeave}
       style={{
         perspective,
-        rotateX: springX,
-        rotateY: springY,
+        rotateX: isTouch ? 0 : springX,
+        rotateY: isTouch ? 0 : springY,
         scale,
       }}
       className={`relative ${className}`}
