@@ -6,15 +6,27 @@ import { AdminSidebar } from "@/src/components/admin/AdminSidebar";
 
 import { API_BASE } from "@/src/lib/constants";
 
-async function validateToken(): Promise<boolean> {
+function getSessionFromStorage() {
+  if (typeof window === "undefined") return null;
   try {
     const sessionStr = localStorage.getItem("admin_session");
-    if (!sessionStr) return false;
+    if (!sessionStr) return null;
     const session = JSON.parse(sessionStr);
-    const token = session.session?.access_token;
-    if (!token || session.user?.role !== "admin") return false;
+    if (session.session?.access_token && session.user?.role === "admin") {
+      return session;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+async function validateToken(): Promise<boolean> {
+  try {
+    const session = getSessionFromStorage();
+    if (!session) return false;
     const res = await fetch(`${API_BASE}/auth/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${session.session.access_token}` },
     });
     return res.ok;
   } catch {
@@ -26,7 +38,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
   const [authed, setAuthed] = useState<boolean | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isLoginPage = pathname === "/admin/login";
 
@@ -35,26 +46,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       setAuthed(true);
       return;
     }
-    const sessionStr = localStorage.getItem("admin_session");
-    if (!sessionStr) {
+
+    const session = getSessionFromStorage();
+    if (!session) {
+      setAuthed(false);
       router.replace("/admin/login");
       return;
     }
-    try {
-      const session = JSON.parse(sessionStr);
-      if (session.user?.role !== "admin") {
-        router.replace("/admin/login");
-        return;
-      }
-      const valid = await validateToken();
-      if (!valid) {
-        localStorage.removeItem("admin_session");
-        router.replace("/admin/login");
-        return;
-      }
-      setIsAdmin(true);
-      setAuthed(true);
-    } catch {
+
+    setAuthed(true);
+
+    const valid = await validateToken();
+    if (!valid) {
+      localStorage.removeItem("admin_session");
+      setAuthed(false);
       router.replace("/admin/login");
     }
   }, [router, isLoginPage]);
@@ -62,7 +67,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     checkAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pathname]);
 
   if (authed === null) {
     return (
@@ -72,7 +77,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  if (!isLoginPage && (!authed || !isAdmin)) return null;
+  if (!isLoginPage && !authed) return null;
 
   if (isLoginPage) {
     return <>{children}</>;

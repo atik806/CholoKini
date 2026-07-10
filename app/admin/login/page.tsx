@@ -24,16 +24,21 @@ export default function AdminLoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const json = await res.json();
+      const json = await res.json().catch(() => null);
       if (!res.ok) {
-        setError("Invalid email or password");
+        const msg = json?.message || `Login failed (${res.status})`;
+        setError(msg);
+        return;
+      }
+      if (!json?.data?.session?.access_token) {
+        setError("Invalid response from server");
         return;
       }
       localStorage.setItem("admin_session", JSON.stringify(json.data));
       const redirect = new URLSearchParams(window.location.search).get("redirect") || "/admin";
       router.push(redirect);
-    } catch {
-      setError("Invalid email or password");
+    } catch (err) {
+      setError(err instanceof Error ? `Connection failed: ${err.message}` : "Cannot reach server");
     } finally {
       setLoading(false);
     }
