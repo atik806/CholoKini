@@ -1,10 +1,22 @@
 import { API_BASE } from "./constants";
 
+export interface ShippingAddress {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  zipCode?: string;
+}
+
 export interface AuthUser {
   id: string;
   name: string;
   email: string;
+  phone?: string;
   avatar_url?: string;
+  shipping_address?: ShippingAddress;
   role: string;
 }
 
@@ -70,7 +82,7 @@ export async function refreshSession(
 
 export async function getProfile(
   token: string,
-): Promise<{ id: string; name: string; email: string; avatar_url?: string; role: string }> {
+): Promise<AuthUser> {
   const res = await fetch(`${API_BASE}/auth/profile`, {
     headers: authHeaders(token),
   });
@@ -81,8 +93,8 @@ export async function getProfile(
 
 export async function updateProfile(
   token: string,
-  updates: { name?: string; phone?: string; avatar_url?: string },
-): Promise<{ id: string; name: string; email: string; avatar_url?: string; role: string }> {
+  updates: { name?: string; phone?: string; avatar_url?: string; shipping_address?: ShippingAddress },
+): Promise<AuthUser> {
   const res = await fetch(`${API_BASE}/auth/profile`, {
     method: "PATCH",
     headers: authHeaders(token),
