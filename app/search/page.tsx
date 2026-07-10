@@ -8,6 +8,7 @@ import type { Product } from "@/src/types/product";
 import { ProductGrid } from "@/src/components/product/ProductGrid";
 import { Breadcrumbs } from "@/src/components/ui/Breadcrumbs";
 import { EmptyState } from "@/src/components/ui/EmptyState";
+import { ShopSkeleton } from "@/src/components/ui/Skeleton";
 import { fetchProducts } from "@/src/lib/api";
 
 export default function SearchPageWrapper() {
@@ -32,12 +33,16 @@ function SearchPage() {
 
   useEffect(() => {
     if (!query) return;
-    fetchProducts({ search: query, limit: 100 })
+    const controller = new AbortController();
+    fetchProducts({ search: query, limit: 100 }, controller.signal)
       .then((result) => {
         setResults(result.products);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
   }, [query]);
 
   return (
@@ -90,7 +95,9 @@ function SearchPage() {
         </div>
       )}
 
-      {!loading && results.length > 0 ? (
+      {loading && query ? (
+        <ShopSkeleton />
+      ) : !loading && results.length > 0 ? (
         <ProductGrid products={results} />
       ) : !loading && query ? (
         <EmptyState

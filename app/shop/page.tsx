@@ -8,6 +8,7 @@ import { categories, sortOptions } from "@/src/lib/constants";
 import { ProductGrid } from "@/src/components/product/ProductGrid";
 import { ProductFilters } from "@/src/components/product/ProductFilters";
 import { Breadcrumbs } from "@/src/components/ui/Breadcrumbs";
+import { ShopSkeleton } from "@/src/components/ui/Skeleton";
 import { fetchProducts, type ProductListResult } from "@/src/lib/api";
 
 const ITEMS_PER_PAGE = 12;
@@ -42,13 +43,14 @@ function ShopPage() {
     [categoriesParam]
   );
 
-  const filters = {
+  const filters = useMemo(() => ({
     categories: selectedCategoryNames,
     priceRange,
     rating: ratingParam ? parseInt(ratingParam, 10) : null,
-  };
+  }), [selectedCategoryNames, priceRange, ratingParam]);
 
   useEffect(() => {
+    const controller = new AbortController();
     const selected = selectedCategoryNames;
     const params: Record<string, unknown> = {};
 
@@ -66,7 +68,7 @@ function ShopPage() {
       params.category = CATEGORY_SLUG[selected[0]];
     }
 
-    fetchProducts(params as Parameters<typeof fetchProducts>[0])
+    fetchProducts(params as Parameters<typeof fetchProducts>[0], controller.signal)
       .then((result) => {
         if (selected.length > 1) {
           result.products = result.products.filter((p) =>
@@ -81,7 +83,10 @@ function ShopPage() {
         setData(result);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
   }, [selectedCategoryNames, priceRange, ratingParam, sort, page]);
 
   const updateParams = useCallback(
@@ -166,9 +171,7 @@ function ShopPage() {
 
         <div className="flex-1 min-w-0">
           {loading ? (
-            <div className="text-center py-20 text-zinc-500 dark:text-zinc-400">
-              Loading products...
-            </div>
+            <ShopSkeleton />
           ) : (
             <>
               <AnimatePresence mode="wait">

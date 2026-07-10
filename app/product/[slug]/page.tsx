@@ -11,6 +11,7 @@ import { Breadcrumbs } from "@/src/components/ui/Breadcrumbs";
 import { Badge } from "@/src/components/ui/Badge";
 import { Rating } from "@/src/components/ui/Rating";
 import { Button } from "@/src/components/ui/Button";
+import { ProductDetailSkeleton } from "@/src/components/ui/Skeleton";
 import { formatPrice } from "@/src/lib/utils";
 import { useCartStore } from "@/src/store/useCartStore";
 import { categories } from "@/src/lib/constants";
@@ -30,24 +31,24 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const controller = new AbortController();
     Promise.all([
-      fetchProductBySlug(slug),
-      fetchRelatedProducts(slug),
+      fetchProductBySlug(slug, controller.signal),
+      fetchRelatedProducts(slug, controller.signal),
     ])
       .then(([prod, rel]) => {
         setProduct(prod);
         setRelated(rel);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
   }, [slug]);
 
   if (loading) {
-    return (
-      <div className="container py-20 text-center text-zinc-500 dark:text-zinc-400">
-        Loading...
-      </div>
-    );
+    return <ProductDetailSkeleton />;
   }
 
   if (!product) {

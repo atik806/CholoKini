@@ -6,13 +6,22 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import type { Product } from "@/src/types/product";
 import { ProductCard } from "@/src/components/product/ProductCard";
+import { ProductCardSkeleton } from "@/src/components/ui/Skeleton";
 import { fetchFeaturedProducts } from "@/src/lib/api";
 
 export function TrendingProducts() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchFeaturedProducts().then(setProducts).catch(() => {});
+    const controller = new AbortController();
+    fetchFeaturedProducts(controller.signal)
+      .then(setProducts)
+      .catch(() => {})
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
   }, []);
 
   const trending = products.slice(0, 4);
@@ -48,9 +57,13 @@ export function TrendingProducts() {
         </motion.div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {trending.map((product, i) => (
-            <ProductCard key={product.id} product={product} index={i} />
-          ))}
+          {loading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))
+            : trending.map((product, i) => (
+                <ProductCard key={product.id} product={product} index={i} />
+              ))}
         </div>
       </div>
     </section>

@@ -73,8 +73,8 @@ function mapCategory(c: BackendCategory): Category {
   };
 }
 
-async function fetcher<T>(url: string): Promise<ApiResponse<T>> {
-  const res = await fetch(`${API_BASE}${url}`);
+async function fetcher<T>(url: string, signal?: AbortSignal): Promise<ApiResponse<T>> {
+  const res = await fetch(`${API_BASE}${url}`, { signal });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.message || `HTTP ${res.status}`);
@@ -102,7 +102,7 @@ export interface ProductListResult {
   totalPages: number;
 }
 
-export async function fetchProducts(params: ProductQueryParams = {}): Promise<ProductListResult> {
+export async function fetchProducts(params: ProductQueryParams = {}, signal?: AbortSignal): Promise<ProductListResult> {
   const qs = new URLSearchParams();
   if (params.search) qs.set('search', params.search);
   if (params.category) qs.set('category', params.category);
@@ -117,7 +117,7 @@ export async function fetchProducts(params: ProductQueryParams = {}): Promise<Pr
   }
 
   const q = qs.toString();
-  const res = await fetcher<BackendProduct[]>(`/products${q ? `?${q}` : ''}`);
+  const res = await fetcher<BackendProduct[]>(`/products${q ? `?${q}` : ''}`, signal);
   return {
     products: (res.data || []).map(mapProduct),
     total: res.meta?.total || 0,
@@ -127,26 +127,26 @@ export async function fetchProducts(params: ProductQueryParams = {}): Promise<Pr
   };
 }
 
-export async function fetchProductBySlug(slug: string): Promise<Product | null> {
+export async function fetchProductBySlug(slug: string, signal?: AbortSignal): Promise<Product | null> {
   try {
-    const res = await fetcher<BackendProduct>(`/products/${encodeURIComponent(slug)}`);
+    const res = await fetcher<BackendProduct>(`/products/${encodeURIComponent(slug)}`, signal);
     return res.data ? mapProduct(res.data) : null;
   } catch {
     return null;
   }
 }
 
-export async function fetchRelatedProducts(slug: string): Promise<Product[]> {
+export async function fetchRelatedProducts(slug: string, signal?: AbortSignal): Promise<Product[]> {
   try {
-    const res = await fetcher<BackendProduct[]>(`/products/${encodeURIComponent(slug)}/related`);
+    const res = await fetcher<BackendProduct[]>(`/products/${encodeURIComponent(slug)}/related`, signal);
     return (res.data || []).map(mapProduct);
   } catch {
     return [];
   }
 }
 
-export async function fetchFeaturedProducts(): Promise<Product[]> {
-  const res = await fetcher<BackendProduct[]>('/products/featured');
+export async function fetchFeaturedProducts(signal?: AbortSignal): Promise<Product[]> {
+  const res = await fetcher<BackendProduct[]>('/products/featured', signal);
   return (res.data || []).map(mapProduct);
 }
 
@@ -154,14 +154,14 @@ export interface CategoryListResult {
   categories: Category[];
 }
 
-export async function fetchCategories(): Promise<Category[]> {
-  const res = await fetcher<BackendCategory[]>('/categories');
+export async function fetchCategories(signal?: AbortSignal): Promise<Category[]> {
+  const res = await fetcher<BackendCategory[]>('/categories', signal);
   return (res.data || []).map(mapCategory);
 }
 
-export async function fetchCategoryBySlug(slug: string): Promise<Category | null> {
+export async function fetchCategoryBySlug(slug: string, signal?: AbortSignal): Promise<Category | null> {
   try {
-    const res = await fetcher<BackendCategory>(`/categories/${encodeURIComponent(slug)}`);
+    const res = await fetcher<BackendCategory>(`/categories/${encodeURIComponent(slug)}`, signal);
     return res.data ? mapCategory(res.data) : null;
   } catch {
     return null;

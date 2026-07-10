@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import type { Product, Category } from "@/src/types/product";
 import { ProductGrid } from "@/src/components/product/ProductGrid";
 import { Breadcrumbs } from "@/src/components/ui/Breadcrumbs";
+import { ShopSkeleton } from "@/src/components/ui/Skeleton";
 import { fetchCategoryBySlug, fetchProducts } from "@/src/lib/api";
 
 export default function CategoryPage() {
@@ -16,24 +17,24 @@ export default function CategoryPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const controller = new AbortController();
     Promise.all([
-      fetchCategoryBySlug(categorySlug),
-      fetchProducts({ category: categorySlug, limit: 100 }),
+      fetchCategoryBySlug(categorySlug, controller.signal),
+      fetchProducts({ category: categorySlug, limit: 100 }, controller.signal),
     ])
       .then(([cat, result]) => {
         setCategory(cat);
         setProducts(result.products);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
   }, [categorySlug]);
 
   if (loading) {
-    return (
-      <div className="container py-20 text-center text-zinc-500 dark:text-zinc-400">
-        Loading...
-      </div>
-    );
+    return <ShopSkeleton />;
   }
 
   if (!category) {
