@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
@@ -12,7 +13,7 @@ interface CategoryCardProps {
   index?: number;
 }
 
-export function CategoryCard({ category, index = 0 }: CategoryCardProps) {
+export const CategoryCard = memo(function CategoryCard({ category, index = 0 }: CategoryCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -49,4 +50,4 @@ export function CategoryCard({ category, index = 0 }: CategoryCardProps) {
       </TiltCard>
     </motion.div>
   );
-}
+});
