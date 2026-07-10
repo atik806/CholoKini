@@ -8,7 +8,6 @@ import { StatusBadge } from "@/src/components/admin/StatusBadge";
 import { formatPrice, formatDate, safeImage, cn } from "@/src/lib/utils";
 import { SITE_NAME } from "@/src/lib/constants";
 import type { Order } from "@/src/lib/admin-api";
-import { jsPDF } from "jspdf";
 
 const statusSteps = ["pending", "confirmed", "shipped", "delivered"];
 
@@ -62,8 +61,9 @@ export default function OrderDetailPage() {
     }
   };
 
-  const handleDownloadReceipt = useCallback(() => {
+  const handleDownloadReceipt = useCallback(async () => {
     if (!order) return;
+    const { jsPDF } = await import("jspdf");
     const addr = order.shipping_address as Record<string, string> | undefined;
     const customerName = addr?.firstName && addr?.lastName
       ? `${addr.firstName} ${addr.lastName}`
