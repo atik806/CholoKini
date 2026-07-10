@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Check, Sparkles, Truck, ClipboardList, DollarSign, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCartStore } from "@/src/store/useCartStore";
+import { useIsLoggedIn, useAuthHydrated } from "@/src/store/useAuthStore";
 import { formatPrice as fp, safeImage } from "@/src/lib/utils";
 import { Button } from "@/src/components/ui/Button";
 import { Input } from "@/src/components/ui/Input";
@@ -20,6 +22,9 @@ const steps = [
 ];
 
 export default function CheckoutPage() {
+  const router = useRouter();
+  const authHydrated = useAuthHydrated();
+  const isLoggedIn = useIsLoggedIn();
   const [step, setStep] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [placing, setPlacing] = useState(false);
@@ -32,6 +37,12 @@ export default function CheckoutPage() {
   });
   const [payment, setPayment] = useState({ method: "cod" });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (authHydrated && !isLoggedIn) {
+      router.replace("/login?redirect=/checkout");
+    }
+  }, [authHydrated, isLoggedIn, router]);
 
   const validateShipping = useCallback(() => {
     const errs: Record<string, string> = {};
@@ -88,6 +99,14 @@ export default function CheckoutPage() {
       setPlacing(false);
     }
   }, [shipping, items, clearCart]);
+
+  if (!authHydrated || !isLoggedIn) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (items.length === 0 && !completed) {
     return (
