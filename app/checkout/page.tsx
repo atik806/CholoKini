@@ -71,11 +71,19 @@ export default function CheckoutPage() {
     setErrors(errs);
     if (Object.keys(errs).length === 0) {
       if (step === 0 && session?.access_token) {
-        authFetch(`${API_BASE}/auth/profile`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ shipping_address: shipping }),
-        }).catch(() => {});
+        try {
+          const res = await authFetch(`${API_BASE}/auth/profile`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ shipping_address: shipping }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data?.data?.shipping_address) {
+              useAuthStore.getState().updateUser({ shipping_address: data.data.shipping_address });
+            }
+          }
+        } catch {}
       }
       setStep((s) => s + 1);
     }
@@ -107,6 +115,7 @@ export default function CheckoutPage() {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.message || "Failed to place order");
       }
+      useAuthStore.getState().updateUser({ shipping_address: shipping });
       clearCart();
       setCompleted(true);
     } catch (e) {
