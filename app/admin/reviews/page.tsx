@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Trash2, Star } from "lucide-react";
 import { DataTable, type Column } from "@/src/components/admin/DataTable";
@@ -14,7 +14,7 @@ export default function AdminReviewsPage() {
   const [error, setError] = useState("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const load = useCallback(async (page: number) => {
+  const load = async (page: number) => {
     setLoading(true);
     setError("");
     try {
@@ -26,11 +26,22 @@ export default function AdminReviewsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
-    load(1);
-  }, [load]);
+    let active = true;
+    (async () => {
+      try {
+        const res = await fetchAdminReviews({ page: 1, limit: 20 });
+        if (active) { setReviews(res.reviews); setMeta(res.meta); }
+      } catch (err) {
+        if (active) setError(err instanceof Error ? err.message : "Failed to load reviews");
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+    return () => { active = false; };
+  }, []);
 
   const handleDelete = async (review: AdminReview) => {
     const confirmed = window.confirm("Are you sure you want to delete this review? This cannot be undone.");

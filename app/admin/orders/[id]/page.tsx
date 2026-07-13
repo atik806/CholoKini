@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, Check, Download } from "lucide-react";
 import { fetchOrder, updateOrderStatus, updatePaymentStatus } from "@/src/lib/admin-api";
@@ -29,19 +29,20 @@ export default function OrderDetailPage() {
   const [error, setError] = useState("");
   const [updating, setUpdating] = useState(false);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await fetchOrder(id);
-      setOrder(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load order");
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const data = await fetchOrder(id);
+        if (active) setOrder(data);
+      } catch (err) {
+        if (active) setError(err instanceof Error ? err.message : "Failed to load order");
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+    return () => { active = false; };
   }, [id]);
-
-  useEffect(() => { load(); }, [load]);
 
   const currentStepIndex = order ? statusSteps.indexOf(order.status) : -1;
 

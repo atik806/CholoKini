@@ -20,12 +20,18 @@ export default function AdminUsersPage() {
   const [formLoading, setFormLoading] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
-    setError("");
-    fetchUsers()
-      .then(setUsers)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    let active = true;
+    (async () => {
+      try {
+        const data = await fetchUsers();
+        if (active) setUsers(data);
+      } catch (err) {
+        if (active) setError(err instanceof Error ? err.message : "Failed to load users");
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+    return () => { active = false; };
   }, []);
 
   const filtered = useMemo(() => {

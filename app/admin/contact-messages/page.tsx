@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Eye, EyeOff, Trash2, X, Loader2 } from "lucide-react";
 import { DataTable, type Column } from "@/src/components/admin/DataTable";
@@ -20,7 +20,7 @@ export default function AdminContactMessagesPage() {
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
 
-  const load = useCallback(async (page: number) => {
+  const load = async (page: number) => {
     setLoading(true);
     try {
       const res = await fetchContactMessages({ page, limit: 20 });
@@ -31,9 +31,19 @@ export default function AdminContactMessagesPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  useEffect(() => { load(1); }, [load]);
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const res = await fetchContactMessages({ page: 1, limit: 20 });
+        if (active) { setMessages(res.messages); setMeta(res.meta); }
+      } catch { /* 401 redirect */ }
+      finally { if (active) setLoading(false); }
+    })();
+    return () => { active = false; };
+  }, []);
 
   const handleMarkRead = async (msg: ContactMessage) => {
     if (msg.is_read) return;

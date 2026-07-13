@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Upload, Image as ImageIcon, AlertTriangle, ArrowUp, Minus, ChevronDown } from "lucide-react";
+import { X, Image as ImageIcon, AlertTriangle, ArrowUp, Minus, ChevronDown } from "lucide-react";
 import { submitReport, uploadReportScreenshot } from "@/src/lib/api";
 
 interface ReportModalProps {
@@ -20,18 +20,6 @@ export function ReportModal({ open, onClose }: ReportModalProps) {
   const [error, setError] = useState("");
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (open) {
-      setMessage("");
-      setPriority("medium");
-      setFile(null);
-      setPreview(null);
-      setLoading(false);
-      setSuccess(false);
-      setError("");
-    }
-  }, [open]);
 
   useEffect(() => {
     return () => {

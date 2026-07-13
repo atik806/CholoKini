@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useState, useCallback } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
 interface TiltCardProps {
@@ -21,7 +21,9 @@ export function TiltCard({
   glare = true,
 }: TiltCardProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [isTouch, setIsTouch] = useState(false);
+  const [isTouch] = useState(() =>
+    typeof window !== "undefined" ? ("ontouchstart" in window || navigator.maxTouchPoints > 0) : false
+  );
   const [glareX, setGlareX] = useState(50);
   const [glareY, setGlareY] = useState(50);
 
@@ -65,10 +67,6 @@ export function TiltCard({
       setGlareY(50);
     }
   }, [x, y, glare]);
-
-  useEffect(() => {
-    setIsTouch("ontouchstart" in window || navigator.maxTouchPoints > 0);
-  }, []);
 
   return (
     <motion.div

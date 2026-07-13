@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fetchOrders } from "@/src/lib/admin-api";
 import { DataTable, type Column } from "@/src/components/admin/DataTable";
@@ -18,24 +18,24 @@ export default function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [page, setPage] = useState(1);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params: { page: number; limit: number; status?: string } = { page, limit: 20 };
-      if (statusFilter !== "All") params.status = statusFilter.toLowerCase();
-      const result = await fetchOrders(params);
-      setOrders(result.orders);
-      setMeta(result.meta);
-    } catch {
-      setOrders([]);
-    } finally {
-      setLoading(false);
-    }
+  const handleFilterChange = (filter: string) => {
+    setStatusFilter(filter);
+    setPage(1);
+  };
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const params: { page: number; limit: number; status?: string } = { page, limit: 20 };
+        if (statusFilter !== "All") params.status = statusFilter.toLowerCase();
+        const result = await fetchOrders(params);
+        if (active) { setOrders(result.orders); setMeta(result.meta); }
+      } catch { if (active) setOrders([]); }
+      finally { if (active) setLoading(false); }
+    })();
+    return () => { active = false; };
   }, [page, statusFilter]);
-
-  useEffect(() => { load(); }, [load]);
-
-  useEffect(() => { setPage(1); }, [statusFilter]);
 
   const columns: Column<Order>[] = [
     {
@@ -85,7 +85,7 @@ export default function OrdersPage() {
         {statusFilters.map((s) => (
           <button
             key={s}
-            onClick={() => setStatusFilter(s)}
+            onClick={() => handleFilterChange(s)}
             className={`px-4 py-1.5 rounded-xl text-sm font-medium transition-colors ${
               statusFilter === s
                 ? "bg-primary text-white"

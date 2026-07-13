@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { fetchCategories } from "@/src/lib/api";
@@ -25,7 +25,7 @@ export default function CategoriesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const load = useCallback(async () => {
+  const load = async () => {
     setLoading(true);
     try {
       const data = await fetchCategories();
@@ -35,9 +35,22 @@ export default function CategoriesPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const data = await fetchCategories();
+        if (active) setCategories(data);
+      } catch (err) {
+        if (active) setError(err instanceof Error ? err.message : "Failed to load categories");
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+    return () => { active = false; };
+  }, []);
 
   const handleCreate = async (data: CategoryFormData) => {
     setSubmitting(true);
@@ -185,6 +198,7 @@ export default function CategoriesPage() {
       </div>
 
       <CategoryForm
+        key={formOpen ? (editingCategory?.slug ?? "new") : "closed"}
         isOpen={formOpen}
         onClose={() => { setFormOpen(false); setEditingCategory(null); setEditingId(null); }}
         onSubmit={editingCategory ? handleUpdate : handleCreate}

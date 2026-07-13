@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { Plus, Edit, Trash2, Package, AlertTriangle, CheckCircle } from "lucide-react";
 import { fetchProducts, fetchCategories } from "@/src/lib/api";
@@ -24,22 +23,29 @@ export default function AdminProductsPage() {
   const [page, setPage] = useState(1);
   const perPage = 10;
 
+  const handleFilterChange = (updater: (prev: string) => string) => {
+    setCategoryFilter(updater);
+    setPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
   useEffect(() => {
+    let active = true;
     Promise.all([
       fetchProducts({ limit: 100 }),
       fetchCategories(),
     ])
       .then(([productsRes, cats]) => {
-        setProducts(productsRes.products);
-        setCategories(cats);
+        if (active) { setProducts(productsRes.products); setCategories(cats); }
       })
-      .catch(() => addToast("Failed to load products", "error"))
-      .finally(() => setLoading(false));
+      .catch(() => { if (active) addToast("Failed to load products", "error"); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
   }, [addToast]);
-
-  useEffect(() => {
-    setPage(1);
-  }, [search, categoryFilter]);
 
   const filtered = useMemo(() => {
     let result = products;
@@ -187,7 +193,7 @@ export default function AdminProductsPage() {
       {categoryOptions.length > 0 && (
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <button
-            onClick={() => setCategoryFilter("")}
+            onClick={() => handleFilterChange(() => "")}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               !categoryFilter
                 ? "bg-primary text-white"
@@ -199,7 +205,7 @@ export default function AdminProductsPage() {
           {categoryOptions.map((cat) => (
             <button
               key={cat.slug}
-              onClick={() => setCategoryFilter(cat.name)}
+              onClick={() => handleFilterChange(() => cat.name)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 categoryFilter === cat.name
                   ? "bg-primary text-white"
@@ -218,7 +224,7 @@ export default function AdminProductsPage() {
         keyExtractor={(p) => p.id}
         searchable
         searchValue={search}
-        onSearchChange={setSearch}
+        onSearchChange={handleSearchChange}
         loading={loading}
         pagination={totalPages > 1 ? { page, totalPages, onPageChange: setPage } : undefined}
       />

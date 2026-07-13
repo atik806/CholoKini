@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { AdminSidebar } from "@/src/components/admin/AdminSidebar";
 
@@ -41,31 +41,28 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isLoginPage = pathname === "/admin/login";
 
-  const checkAuth = useCallback(async () => {
-    if (isLoginPage) {
-      setAuthed(true);
-      return;
-    }
-
-    const session = getSessionFromStorage();
-    if (!session) {
-      setAuthed(false);
-      router.replace("/admin/login");
-      return;
-    }
-
-    setAuthed(true);
-
-    const valid = await validateToken();
-    if (!valid) {
-      localStorage.removeItem("admin_session");
-      setAuthed(false);
-      router.replace("/admin/login");
-    }
-  }, [router, isLoginPage]);
-
   useEffect(() => {
-    checkAuth();
+    let active = true;
+    (async () => {
+      if (isLoginPage) {
+        if (active) setAuthed(true);
+        return;
+      }
+      const session = getSessionFromStorage();
+      if (!session) {
+        if (active) setAuthed(false);
+        router.replace("/admin/login");
+        return;
+      }
+      if (active) setAuthed(true);
+      const valid = await validateToken();
+      if (!valid && active) {
+        localStorage.removeItem("admin_session");
+        setAuthed(false);
+        router.replace("/admin/login");
+      }
+    })();
+    return () => { active = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 

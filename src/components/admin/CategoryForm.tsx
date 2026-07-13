@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2 } from "lucide-react";
 import { slugify } from "@/src/lib/utils";
@@ -21,23 +21,12 @@ interface CategoryFormProps {
 }
 
 export function CategoryForm({ isOpen, onClose, onSubmit, initialData, loading }: CategoryFormProps) {
-  const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
-  const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [name, setName] = useState(initialData?.name ?? "");
+  const [slug, setSlug] = useState(initialData?.slug ?? "");
+  const [description, setDescription] = useState(initialData?.description ?? "");
+  const [imageUrl, setImageUrl] = useState(initialData?.image_url ?? "");
   const [error, setError] = useState("");
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      setName(initialData?.name || "");
-      setSlug(initialData?.slug || "");
-      setDescription(initialData?.description || "");
-      setImageUrl(initialData?.image_url || "");
-      setError("");
-      setSlugManuallyEdited(false);
-    }
-  }, [isOpen, initialData]);
 
   const handleNameChange = (value: string) => {
     setName(value);

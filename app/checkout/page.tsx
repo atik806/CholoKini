@@ -34,10 +34,14 @@ export default function CheckoutPage() {
   const items = useCartStore((s) => s.items);
   const clearCart = useCartStore((s) => s.clearCart);
   const [shipping, setShipping] = useState({
-    firstName: "", lastName: "", email: "", phone: "",
-    address: "", city: "", zipCode: "",
+    firstName: user?.shipping_address?.firstName || "",
+    lastName: user?.shipping_address?.lastName || "",
+    email: user?.shipping_address?.email || user?.email || "",
+    phone: user?.shipping_address?.phone || "",
+    address: user?.shipping_address?.address || "",
+    city: user?.shipping_address?.city || "",
+    zipCode: user?.shipping_address?.zipCode || "",
   });
-  const [payment, setPayment] = useState({ method: "cod" });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -45,23 +49,6 @@ export default function CheckoutPage() {
       router.replace("/login?redirect=/checkout");
     }
   }, [authHydrated, isLoggedIn, router]);
-
-  useEffect(() => {
-    if (user?.shipping_address) {
-      const addr = user.shipping_address;
-      setShipping({
-        firstName: addr.firstName || "",
-        lastName: addr.lastName || "",
-        email: addr.email || user.email || "",
-        phone: addr.phone || "",
-        address: addr.address || "",
-        city: addr.city || "",
-        zipCode: addr.zipCode || "",
-      });
-    } else if (user) {
-      setShipping((prev) => ({ ...prev, email: user.email || "" }));
-    }
-  }, [user]);
 
   const validateShipping = useCallback(() => {
     const errs: Record<string, string> = {};

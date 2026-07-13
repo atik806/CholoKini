@@ -17,19 +17,19 @@ export default function WishlistPage() {
 
   useEffect(() => {
     if (wishlistIds.length === 0) {
-      setLoading(false);
       return;
     }
+    let active = true;
     const controller = new AbortController();
     fetchProducts({ limit: 100, ids: wishlistIds }, controller.signal)
       .then((result) => {
-        setWishlistProducts(result.products.filter((p) => wishlistIds.includes(p.id)));
-        setLoading(false);
+        if (active) {
+          setWishlistProducts(result.products.filter((p) => wishlistIds.includes(p.id)));
+          setLoading(false);
+        }
       })
-      .catch(() => {
-        if (!controller.signal.aborted) setLoading(false);
-      });
-    return () => controller.abort();
+      .catch(() => { if (active) setLoading(false); });
+    return () => { active = false; controller.abort(); };
   }, [wishlistIds]);
 
   if (wishlistIds.length === 0) {

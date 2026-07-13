@@ -80,7 +80,7 @@ function ShopPage() {
     swrKey,
     async () => {
       const params = buildFetchParams();
-      let result = await fetchProducts(params as Parameters<typeof fetchProducts>[0]);
+      const result = await fetchProducts(params as Parameters<typeof fetchProducts>[0]);
       if (selectedCategoryNames.length > 1) {
         result.products = result.products.filter((p) =>
           selectedCategoryNames.includes(p.category)
