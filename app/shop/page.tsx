@@ -1,15 +1,16 @@
 "use client";
 
-import { Suspense, useState, useEffect, useCallback, useMemo } from "react";
+import { Suspense, useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
+import useSWR from "swr";
 import { categories, sortOptions } from "@/src/lib/constants";
 import { ProductGrid } from "@/src/components/product/ProductGrid";
 import { ProductFilters } from "@/src/components/product/ProductFilters";
 import { Breadcrumbs } from "@/src/components/ui/Breadcrumbs";
 import { ShopSkeleton } from "@/src/components/ui/Skeleton";
-import { fetchProducts, type ProductListResult } from "@/src/lib/api";
+import { fetchProducts } from "@/src/lib/api";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -29,8 +30,6 @@ function ShopPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-  const [data, setData] = useState<ProductListResult | null>(null);
-  const [loading, setLoading] = useState(true);
 
   const categoriesParam = searchParams.get("categories") || "";
   const priceRange = searchParams.get("price") || "all";
@@ -49,11 +48,19 @@ function ShopPage() {
     rating: ratingParam ? parseInt(ratingParam, 10) : null,
   }), [selectedCategoryNames, priceRange, ratingParam]);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    const selected = selectedCategoryNames;
-    const params: Record<string, unknown> = {};
+  const swrKey = useMemo(() => {
+    const parts: string[] = [];
+    if (selectedCategoryNames.length === 1) parts.push(`cat=${CATEGORY_SLUG[selectedCategoryNames[0]]}`);
+    if (selectedCategoryNames.length > 1) parts.push(`cats=${selectedCategoryNames.join(",")}`);
+    if (priceRange !== "all") parts.push(`price=${priceRange}`);
+    if (ratingParam) parts.push(`rating=${ratingParam}`);
+    parts.push(`sort=${sort}`);
+    parts.push(`page=${page}`);
+    return `/shop?${parts.join("&")}`;
+  }, [selectedCategoryNames, priceRange, ratingParam, sort, page]);
 
+  const buildFetchParams = useCallback(() => {
+    const params: Record<string, unknown> = {};
     if (priceRange !== "all") {
       const [min, max] = priceRange.split("-").map(Number);
       params.priceMin = min;
@@ -63,31 +70,31 @@ function ShopPage() {
     params.sort = sort;
     params.page = page;
     params.limit = ITEMS_PER_PAGE;
-
-    if (selected.length === 1) {
-      params.category = CATEGORY_SLUG[selected[0]];
+    if (selectedCategoryNames.length === 1) {
+      params.category = CATEGORY_SLUG[selectedCategoryNames[0]];
     }
-
-    fetchProducts(params as Parameters<typeof fetchProducts>[0], controller.signal)
-      .then((result) => {
-        if (selected.length > 1) {
-          result.products = result.products.filter((p) =>
-            selected.includes(p.category)
-          );
-          result.total = result.products.length;
-          result.totalPages = Math.ceil(result.products.length / ITEMS_PER_PAGE);
-          const safePage = Math.min(page, Math.max(result.totalPages, 1));
-          const start = (safePage - 1) * ITEMS_PER_PAGE;
-          result.products = result.products.slice(start, start + ITEMS_PER_PAGE);
-        }
-        setData(result);
-        setLoading(false);
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) setLoading(false);
-      });
-    return () => controller.abort();
+    return params;
   }, [selectedCategoryNames, priceRange, ratingParam, sort, page]);
+
+  const { data, isLoading } = useSWR(
+    swrKey,
+    async () => {
+      const params = buildFetchParams();
+      let result = await fetchProducts(params as Parameters<typeof fetchProducts>[0]);
+      if (selectedCategoryNames.length > 1) {
+        result.products = result.products.filter((p) =>
+          selectedCategoryNames.includes(p.category)
+        );
+        result.total = result.products.length;
+        result.totalPages = Math.ceil(result.products.length / ITEMS_PER_PAGE);
+        const safePage = Math.min(page, Math.max(result.totalPages, 1));
+        const start = (safePage - 1) * ITEMS_PER_PAGE;
+        result.products = result.products.slice(start, start + ITEMS_PER_PAGE);
+      }
+      return result;
+    },
+    { revalidateOnFocus: false, keepPreviousData: true }
+  );
 
   const updateParams = useCallback(
     (updates: Record<string, string | null>) => {
@@ -118,13 +125,6 @@ function ShopPage() {
     [updateParams]
   );
 
-  useEffect(() => {
-    if (mobileFilterOpen) {
-      document.body.style.overflow = "hidden";
-      return () => { document.body.style.overflow = ""; };
-    }
-  }, [mobileFilterOpen]);
-
   const totalPages = data?.totalPages || 0;
   const safePage = Math.min(page, Math.max(totalPages, 1));
   const products = data?.products || [];
@@ -145,7 +145,7 @@ function ShopPage() {
             All Products
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 text-sm">
-            {loading ? "Loading..." : `${total} products found`}
+            {isLoading ? "Loading..." : `${total} products found`}
           </p>
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -177,7 +177,7 @@ function ShopPage() {
         </aside>
 
         <div className="flex-1 min-w-0">
-          {loading ? (
+          {isLoading ? (
             <ShopSkeleton />
           ) : (
             <>

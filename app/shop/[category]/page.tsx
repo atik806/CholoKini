@@ -1,37 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
-import type { Product, Category } from "@/src/types/product";
 import { ProductGrid } from "@/src/components/product/ProductGrid";
 import { Breadcrumbs } from "@/src/components/ui/Breadcrumbs";
 import { ShopSkeleton } from "@/src/components/ui/Skeleton";
-import { fetchCategoryBySlug, fetchProducts } from "@/src/lib/api";
+import { useCategory, useProducts } from "@/src/hooks/useApi";
 
 export default function CategoryPage() {
   const params = useParams();
   const categorySlug = params.category as string;
-  const [category, setCategory] = useState<Category | null>(null);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    Promise.all([
-      fetchCategoryBySlug(categorySlug, controller.signal),
-      fetchProducts({ category: categorySlug, limit: 100 }, controller.signal),
-    ])
-      .then(([cat, result]) => {
-        setCategory(cat);
-        setProducts(result.products);
-        setLoading(false);
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) setLoading(false);
-      });
-    return () => controller.abort();
-  }, [categorySlug]);
+  const { data: category, isLoading: catLoading } = useCategory(categorySlug);
+  const { data: result, isLoading: prodLoading } = useProducts({ category: categorySlug, limit: 100 });
+
+  const loading = catLoading || prodLoading;
 
   if (loading) {
     return <ShopSkeleton />;
@@ -66,7 +49,7 @@ export default function CategoryPage() {
         <p className="text-zinc-500 dark:text-zinc-400 text-sm">{category.description}</p>
       </div>
 
-      <ProductGrid products={products} />
+      <ProductGrid products={result?.products || []} />
     </motion.div>
   );
 }

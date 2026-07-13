@@ -35,7 +35,8 @@ export default function AdminLoginPage() {
         return;
       }
       localStorage.setItem("admin_session", JSON.stringify(json.data));
-      const redirect = new URLSearchParams(window.location.search).get("redirect") || "/admin";
+      const raw = new URLSearchParams(window.location.search).get("redirect") || "/admin";
+      const redirect = raw.startsWith("/admin") ? raw : "/admin";
       router.push(redirect);
     } catch (err) {
       setError(err instanceof Error ? `Connection failed: ${err.message}` : "Cannot reach server");

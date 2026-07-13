@@ -1,30 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import type { Product } from "@/src/types/product";
 import { ProductCard } from "@/src/components/product/ProductCard";
 import { ProductCardSkeleton } from "@/src/components/ui/Skeleton";
-import { fetchFeaturedProducts } from "@/src/lib/api";
+import { useFeaturedProducts } from "@/src/hooks/useApi";
 
 export function TrendingProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    fetchFeaturedProducts(controller.signal)
-      .then(setProducts)
-      .catch(() => {})
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false);
-      });
-    return () => controller.abort();
-  }, []);
-
-  const trending = products.slice(0, 4);
+  const { data: products, isLoading } = useFeaturedProducts();
+  const trending = (products || []).slice(0, 4);
 
   return (
     <section className="py-16 md:py-24 bg-zinc-50/80 dark:bg-zinc-800/50 relative">
@@ -57,7 +42,7 @@ export function TrendingProducts() {
         </motion.div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {loading
+          {isLoading
             ? Array.from({ length: 4 }).map((_, i) => (
                 <ProductCardSkeleton key={i} />
               ))

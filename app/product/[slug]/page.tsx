@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import { Heart, ShoppingBag, Minus, Plus, Truck, Shield, RotateCcw } from "lucide-react";
-import type { Product } from "@/src/types/product";
 import { ProductGallery } from "@/src/components/product/ProductGallery";
 import { ProductGrid } from "@/src/components/product/ProductGrid";
 import { Breadcrumbs } from "@/src/components/ui/Breadcrumbs";
@@ -16,7 +15,7 @@ import { formatPrice } from "@/src/lib/utils";
 import { useCartStore } from "@/src/store/useCartStore";
 import { categories } from "@/src/lib/constants";
 import { useToast } from "@/src/providers/ToastProvider";
-import { fetchProductBySlug, fetchRelatedProducts } from "@/src/lib/api";
+import { useProduct, useRelatedProducts } from "@/src/hooks/useApi";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -26,28 +25,11 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string>();
   const [selectedColor, setSelectedColor] = useState<string>();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [related, setRelated] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    Promise.all([
-      fetchProductBySlug(slug, controller.signal),
-      fetchRelatedProducts(slug, controller.signal),
-    ])
-      .then(([prod, rel]) => {
-        setProduct(prod);
-        setRelated(rel);
-        setLoading(false);
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) setLoading(false);
-      });
-    return () => controller.abort();
-  }, [slug]);
+  const { data: product, isLoading } = useProduct(slug);
+  const { data: related } = useRelatedProducts(slug);
 
-  if (loading) {
+  if (isLoading) {
     return <ProductDetailSkeleton />;
   }
 
@@ -224,12 +206,12 @@ export default function ProductDetailPage() {
         </div>
       </div>
 
-      {related.length > 0 && (
+      {(related || []).length > 0 && (
         <section>
           <h2 className="font-serif text-2xl font-bold mb-8">
             You May Also Like
           </h2>
-          <ProductGrid products={related} />
+          <ProductGrid products={related || []} />
         </section>
       )}
 
