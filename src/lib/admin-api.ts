@@ -145,3 +145,42 @@ export async function markMessageRead(id: string): Promise<void> {
 export async function deleteContactMessage(id: string): Promise<void> {
   await adminFetcher(`/admin/contact-messages/${id}`, { method: "DELETE" });
 }
+
+// Bug Reports
+export interface BugReport {
+  id: string;
+  message: string;
+  screenshot_url: string | null;
+  page_url: string;
+  user_id: string | null;
+  priority: "low" | "medium" | "high" | "critical";
+  status: "pending" | "reviewed" | "resolved";
+  admin_reply: string | null;
+  created_at: string;
+}
+export async function fetchBugReports(params?: {
+  page?: number;
+  limit?: number;
+}): Promise<{
+  reports: BugReport[];
+  meta: { total: number; page: number; limit: number; totalPages: number };
+}> {
+  const qs = new URLSearchParams();
+  if (params?.page) qs.set("page", String(params.page));
+  if (params?.limit) qs.set("limit", String(params.limit));
+  const q = qs.toString();
+  const res = await adminFetcher<BugReport[]>(
+    `/admin/bug-reports${q ? `?${q}` : ""}`
+  );
+  return { reports: res.data || [], meta: res.meta! };
+}
+export async function updateBugReport(
+  id: string,
+  body: { status?: string; priority?: string; admin_reply?: string }
+): Promise<BugReport> {
+  const res = await adminFetcher<BugReport>(`/admin/bug-reports/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+  return res.data;
+}

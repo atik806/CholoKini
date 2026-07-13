@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Star, Mail, LogOut,
-  PanelRightClose, PanelRightOpen, Sun, Moon, X,
+  PanelRightClose, PanelRightOpen, Sun, Moon, X, Bug,
 } from "lucide-react";
 import { useTheme } from "@/src/providers/ThemeProvider";
 
@@ -17,6 +17,7 @@ const navItems = [
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/reviews", label: "Reviews", icon: Star },
   { href: "/admin/contact-messages", label: "Messages", icon: Mail },
+  { href: "/admin/bug-reports", label: "Bug Reports", icon: Bug },
 ];
 
 interface AdminSidebarProps {

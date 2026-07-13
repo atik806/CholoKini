@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
-import { Heart, ShoppingBag, Minus, Plus, Truck, Shield, RotateCcw } from "lucide-react";
+import { Heart, ShoppingBag, Minus, Plus } from "lucide-react";
 import { ProductGallery } from "@/src/components/product/ProductGallery";
 import { ProductGrid } from "@/src/components/product/ProductGrid";
 import { Breadcrumbs } from "@/src/components/ui/Breadcrumbs";
@@ -184,20 +184,6 @@ export default function ProductDetailPage() {
                 }`}
               />
             </button>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-10 pt-8 border-t border-zinc-200 dark:border-zinc-700">
-            {[
-              { icon: Truck, label: "Free Shipping", sub: "On orders over ৳50" },
-              { icon: Shield, label: "Secure Checkout", sub: "SSL encrypted" },
-              { icon: RotateCcw, label: "Easy Returns", sub: "30-day policy" },
-            ].map((item) => (
-              <div key={item.label} className="text-center">
-                <item.icon className="w-5 h-5 mx-auto text-primary dark:text-primary-light mb-2" />
-                <p className="text-xs font-semibold">{item.label}</p>
-                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">{item.sub}</p>
-              </div>
-            ))}
           </div>
 
           <div className="mt-6 text-xs text-zinc-500 dark:text-zinc-400">

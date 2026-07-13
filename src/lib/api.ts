@@ -167,3 +167,35 @@ export async function fetchCategoryBySlug(slug: string, signal?: AbortSignal): P
     return null;
   }
 }
+
+export async function submitReport(data: {
+  message: string;
+  screenshot_url?: string | null;
+  page_url: string;
+  priority?: string;
+}): Promise<void> {
+  const res = await fetch(`${API_BASE}/reports`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Failed to submit report');
+  }
+}
+
+export async function uploadReportScreenshot(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch(`${API_BASE}/upload/report-screenshot`, {
+    method: 'POST',
+    body: formData,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Failed to upload screenshot');
+  }
+  const json = await res.json();
+  return json.data?.url || json.url;
+}

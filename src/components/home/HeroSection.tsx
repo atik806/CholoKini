@@ -1,17 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, Shield, Truck, RotateCcw } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { BrandShowcase } from "./BrandShowcase";
 
 const titleWords = ["Discover", "Premium", "Lifestyle"];
-
-const features = [
-  { icon: Truck, label: "Free Shipping", sub: "Orders over ৳50" },
-  { icon: Shield, label: "Secure Checkout", sub: "100% protected" },
-  { icon: RotateCcw, label: "Easy Returns", sub: "30-day policy" },
-];
 
 export function HeroSection() {
   return (
@@ -80,25 +74,6 @@ export function HeroSection() {
               >
                 New Arrivals
               </Link>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.1 }}
-              className="flex flex-wrap items-center gap-6 md:gap-8"
-            >
-              {features.map((f) => (
-                <div key={f.label} className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                    <f.icon className="w-4 h-4 text-primary dark:text-primary-light" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{f.label}</p>
-                    <p className="text-[11px] text-zinc-400 dark:text-zinc-500">{f.sub}</p>
-                  </div>
-                </div>
-              ))}
             </motion.div>
           </div>
 

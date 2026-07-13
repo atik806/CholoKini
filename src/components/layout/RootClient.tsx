@@ -7,6 +7,7 @@ import { CartDrawer } from "./CartDrawer";
 import { Toaster } from "../ui/Toaster";
 import { ScrollToTop } from "../ui/ScrollToTop";
 import { PageLoader } from "../ui/PageLoader";
+import { ReportButton } from "../report/ReportButton";
 
 export function RootClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -20,6 +21,7 @@ export function RootClient({ children }: { children: React.ReactNode }) {
       {!isAdmin && <CartDrawer />}
       <Toaster />
       {!isAdmin && <ScrollToTop />}
+      {!isAdmin && <ReportButton />}
     </>
   );
 }
