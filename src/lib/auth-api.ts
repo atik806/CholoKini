@@ -38,6 +38,20 @@ function authHeaders(token?: string): Record<string, string> {
   return headers;
 }
 
+function parseError(res: { status: number }, json: Record<string, unknown>): string {
+  if (res.status === 429) {
+    return "Too many attempts. Please wait a minute and try again.";
+  }
+  if (Array.isArray(json.errors) && json.errors.length > 0) {
+    const details = json.errors
+      .map((e: { message?: string }) => e.message)
+      .filter(Boolean)
+      .join(". ");
+    return details || (typeof json.message === "string" ? json.message : "Request failed");
+  }
+  return typeof json.message === "string" ? json.message : `Request failed (${res.status})`;
+}
+
 export async function registerUser(
   name: string,
   email: string,
@@ -49,7 +63,7 @@ export async function registerUser(
     body: JSON.stringify({ name, email, password }),
   });
   const json = await res.json();
-  if (!res.ok) throw new Error(json.message || `Registration failed (${res.status})`);
+  if (!res.ok) throw new Error(parseError(res, json));
   return json.data;
 }
 
@@ -63,7 +77,7 @@ export async function loginUser(
     body: JSON.stringify({ email, password }),
   });
   const json = await res.json();
-  if (!res.ok) throw new Error(json.message || `Login failed (${res.status})`);
+  if (!res.ok) throw new Error(parseError(res, json));
   return json.data;
 }
 
@@ -76,7 +90,7 @@ export async function refreshSession(
     body: JSON.stringify({ refresh_token: refreshToken }),
   });
   const json = await res.json();
-  if (!res.ok) throw new Error(json.message || "Session expired");
+  if (!res.ok) throw new Error(parseError(res, json));
   return json.data;
 }
 
@@ -87,7 +101,22 @@ export async function getProfile(
     headers: authHeaders(token),
   });
   const json = await res.json();
-  if (!res.ok) throw new Error(json.message || "Failed to load profile");
+  if (!res.ok) throw new Error(parseError(res, json));
+  return json.data;
+}
+
+export async function syncProfile(
+  token: string,
+  name: string,
+  email: string,
+): Promise<AuthUser> {
+  const res = await fetch(`${API_BASE}/auth/sync-profile`, {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify({ name, email }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(parseError(res, json));
   return json.data;
 }
 
@@ -101,14 +130,19 @@ export async function updateProfile(
     body: JSON.stringify(updates),
   });
   const json = await res.json();
-  if (!res.ok) throw new Error(json.message || "Failed to update profile");
+  if (!res.ok) throw new Error(parseError(res, json));
   return json.data;
 }
 
 let refreshPromise: Promise<string | null> | null = null;
 
 async function getValidToken(): Promise<string | null> {
-  const { useAuthStore } = await import("@/src/store/useAuthStore");
+  let useAuthStore: any;
+  try {
+    useAuthStore = (await import("@/src/store/useAuthStore")).useAuthStore;
+  } catch {
+    return null;
+  }
   const { session, refreshAuth } = useAuthStore.getState();
 
   if (!session?.access_token) return null;
@@ -137,7 +171,7 @@ export async function authFetch(
   options: RequestInit = {},
 ): Promise<Response> {
   let token = await getValidToken();
-  if (!token) throw new Error("Session expired. Please log in again.");
+  if (!token) throw new Error("No active session. Please log in.");
 
   const headers = new Headers(options.headers);
   headers.set("Authorization", `Bearer ${token}`);
@@ -145,12 +179,18 @@ export async function authFetch(
   let res = await fetch(url, { ...options, headers });
 
   if (res.status === 401) {
-    const { useAuthStore } = await import("@/src/store/useAuthStore");
+    let useAuthStore: any;
+    try {
+      useAuthStore = (await import("@/src/store/useAuthStore")).useAuthStore;
+    } catch {
+      throw new Error("Failed to load auth store for token refresh.");
+    }
+
     const ok = await useAuthStore.getState().refreshAuth();
-    if (!ok) throw new Error("Session expired. Please log in again.");
+    if (!ok) throw new Error("Session refresh failed. Please log in again.");
 
     token = useAuthStore.getState().session?.access_token ?? null;
-    if (!token) throw new Error("Session expired. Please log in again.");
+    if (!token) throw new Error("Session refresh returned no token. Please log in again.");
 
     headers.set("Authorization", `Bearer ${token}`);
     res = await fetch(url, { ...options, headers });
