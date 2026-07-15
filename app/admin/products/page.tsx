@@ -9,12 +9,14 @@ import { Button } from "@/src/components/ui/Button";
 import { DataTable, type Column } from "@/src/components/admin/DataTable";
 import { StatsCard } from "@/src/components/admin/StatsCard";
 import { StatusBadge } from "@/src/components/admin/StatusBadge";
+import { useConfirm } from "@/src/components/admin/ConfirmDialog";
 import { formatPrice, safeImage } from "@/src/lib/utils";
 import { useToast } from "@/src/providers/ToastProvider";
 import { adminFetcher } from "@/src/lib/admin-api";
 
 export default function AdminProductsPage() {
   const { addToast } = useToast();
+  const { confirm, dialog } = useConfirm();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +65,8 @@ export default function AdminProductsPage() {
   const paginated = filtered.slice((page - 1) * perPage, page * perPage);
 
   const handleDelete = async (product: Product) => {
-    if (!window.confirm(`Delete "${product.name}"? This cannot be undone.`)) return;
+    const ok = await confirm(`Delete "${product.name}"?`, "This cannot be undone.", { confirmLabel: "Delete", danger: true });
+    if (!ok) return;
     try {
       await adminFetcher(`/products/${product.id}`, { method: "DELETE" });
       addToast("Product deleted successfully", "success");
@@ -171,6 +174,7 @@ export default function AdminProductsPage() {
 
   return (
     <div>
+      {dialog}
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="font-serif text-2xl font-bold">Products</h1>

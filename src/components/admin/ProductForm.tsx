@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Save, Loader2 } from "lucide-react";
 import type { Category } from "@/src/types/product";
 import { Button } from "@/src/components/ui/Button";
+import { ImageUpload } from "@/src/components/admin/ImageUpload";
 
 export interface ProductFormValues {
   name: string;
@@ -61,12 +62,12 @@ export function ProductForm({ initialValues, onSubmit, loading, categories, mode
     await onSubmit(form);
   };
 
-  const update = (key: keyof ProductFormValues, value: string | boolean | number) => {
+  const update = (key: keyof ProductFormValues, value: string | boolean | number | string[]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
-    if (errors[key]) {
+    if (errors[key as string]) {
       setErrors((prev) => {
         const next = { ...prev };
-        delete next[key];
+        delete next[key as string];
         return next;
       });
     }
@@ -165,13 +166,10 @@ export function ProductForm({ initialValues, onSubmit, loading, categories, mode
       </div>
 
       <div>
-        <label className={labelClass}>Image URLs (comma-separated)</label>
-        <input
-          type="text"
-          value={form.images}
-          onChange={(e) => update("images", e.target.value)}
-          placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
-          className={inputClass("images")}
+        <label className={labelClass}>Product Images</label>
+        <ImageUpload
+          value={form.images ? form.images.split(",").map((s) => s.trim()).filter(Boolean) : []}
+          onChange={(urls) => update("images", urls.join(", "))}
         />
       </div>
 

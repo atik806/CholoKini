@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Trash2, Star } from "lucide-react";
 import { DataTable, type Column } from "@/src/components/admin/DataTable";
+import { useConfirm } from "@/src/components/admin/ConfirmDialog";
 import { formatDate } from "@/src/lib/utils";
 import { fetchAdminReviews, deleteAdminReview, type AdminReview } from "@/src/lib/admin-api";
 
 export default function AdminReviewsPage() {
+  const { confirm, dialog } = useConfirm();
   const [reviews, setReviews] = useState<AdminReview[]>([]);
   const [meta, setMeta] = useState({ total: 0, page: 1, limit: 20, totalPages: 1 });
   const [loading, setLoading] = useState(true);
@@ -44,8 +46,8 @@ export default function AdminReviewsPage() {
   }, []);
 
   const handleDelete = async (review: AdminReview) => {
-    const confirmed = window.confirm("Are you sure you want to delete this review? This cannot be undone.");
-    if (!confirmed) return;
+    const ok = await confirm("Delete Review", "Are you sure you want to delete this review? This cannot be undone.", { confirmLabel: "Delete", danger: true });
+    if (!ok) return;
     setActionLoading(review.id);
     try {
       await deleteAdminReview(review.id);
@@ -145,6 +147,7 @@ export default function AdminReviewsPage() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+      {dialog}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-serif text-2xl font-bold">Reviews</h1>

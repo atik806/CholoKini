@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { fetchOrders, deleteOrder } from "@/src/lib/admin-api";
 import { DataTable, type Column } from "@/src/components/admin/DataTable";
 import { StatusBadge } from "@/src/components/admin/StatusBadge";
+import { useConfirm } from "@/src/components/admin/ConfirmDialog";
 import { formatPrice, formatDate } from "@/src/lib/utils";
 import { Trash2 } from "lucide-react";
 import type { Order } from "@/src/lib/admin-api";
@@ -13,10 +14,12 @@ const statusFilters = ["All", "Pending", "Confirmed", "Shipped", "Delivered", "C
 
 export default function OrdersPage() {
   const router = useRouter();
+  const { confirm, dialog } = useConfirm();
   const [orders, setOrders] = useState<Order[]>([]);
   const [meta, setMeta] = useState({ total: 0, page: 1, limit: 20, totalPages: 0 });
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("All");
+  const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
   const handleFilterChange = (filter: string) => {
@@ -24,9 +27,19 @@ export default function OrdersPage() {
     setPage(1);
   };
 
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
   const handleDelete = async (e: React.MouseEvent, orderId: string) => {
     e.stopPropagation();
-    if (!window.confirm("Are you sure you want to permanently delete this order? This action cannot be undone.")) return;
+    const ok = await confirm(
+      "Delete Order",
+      "Are you sure you want to permanently delete this order? This action cannot be undone.",
+      { confirmLabel: "Delete", danger: true }
+    );
+    if (!ok) return;
     try {
       await deleteOrder(orderId);
       setOrders((prev) => prev.filter((o) => o.id !== orderId));
@@ -36,19 +49,25 @@ export default function OrdersPage() {
     }
   };
 
+  const loadOrders = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params: { page: number; limit: number; status?: string; search?: string } = { page, limit: 20 };
+      if (statusFilter !== "All") params.status = statusFilter.toLowerCase();
+      if (search.trim()) params.search = search.trim();
+      const result = await fetchOrders(params);
+      setOrders(result.orders);
+      setMeta(result.meta);
+    } catch {
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, statusFilter, search]);
+
   useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const params: { page: number; limit: number; status?: string } = { page, limit: 20 };
-        if (statusFilter !== "All") params.status = statusFilter.toLowerCase();
-        const result = await fetchOrders(params);
-        if (active) { setOrders(result.orders); setMeta(result.meta); }
-      } catch { if (active) setOrders([]); }
-      finally { if (active) setLoading(false); }
-    })();
-    return () => { active = false; };
-  }, [page, statusFilter]);
+    loadOrders();
+  }, [loadOrders]);
 
   const columns: Column<Order>[] = [
     {
@@ -102,6 +121,7 @@ export default function OrdersPage() {
 
   return (
     <div>
+      {dialog}
       <div className="mb-6">
         <h1 className="font-serif text-2xl font-bold">Orders</h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Manage customer orders</p>
@@ -128,6 +148,9 @@ export default function OrdersPage() {
         data={orders}
         keyExtractor={(o) => o.id}
         onRowClick={(order) => router.push(`/admin/orders/${order.id}`)}
+        searchable
+        searchValue={search}
+        onSearchChange={handleSearchChange}
         pagination={{
           page: meta.page,
           totalPages: meta.totalPages,

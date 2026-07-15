@@ -5,10 +5,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Trash2, Shield, User, Plus, X } from "lucide-react";
 import { DataTable, type Column } from "@/src/components/admin/DataTable";
 import { StatusBadge } from "@/src/components/admin/StatusBadge";
+import { useConfirm } from "@/src/components/admin/ConfirmDialog";
 import { formatDate } from "@/src/lib/utils";
 import { fetchUsers, updateUserRole, deleteUser, createUser, type UserProfile } from "@/src/lib/admin-api";
 
 export default function AdminUsersPage() {
+  const { confirm, dialog } = useConfirm();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -44,10 +46,12 @@ export default function AdminUsersPage() {
 
   const handleRoleToggle = async (user: UserProfile) => {
     const newRole = user.role === "admin" ? "customer" : "admin";
-    const confirmed = window.confirm(
-      `Change role of "${user.name}" from "${user.role}" to "${newRole}"?`
+    const ok = await confirm(
+      "Change Role",
+      `Change role of "${user.name}" from "${user.role}" to "${newRole}"?`,
+      { confirmLabel: "Change" }
     );
-    if (!confirmed) return;
+    if (!ok) return;
     setActionLoading(user.id);
     try {
       const updated = await updateUserRole(user.id, newRole);
@@ -60,10 +64,12 @@ export default function AdminUsersPage() {
   };
 
   const handleDelete = async (user: UserProfile) => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete user "${user.name}"? This cannot be undone.`
+    const ok = await confirm(
+      "Delete User",
+      `Are you sure you want to delete user "${user.name}"? This cannot be undone.`,
+      { confirmLabel: "Delete", danger: true }
     );
-    if (!confirmed) return;
+    if (!ok) return;
     setActionLoading(user.id);
     try {
       await deleteUser(user.id);
@@ -152,6 +158,7 @@ export default function AdminUsersPage() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+      {dialog}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-serif text-2xl font-bold">Users</h1>

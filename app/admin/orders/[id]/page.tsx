@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, Check, Download, Trash2 } from "lucide-react";
 import { fetchOrder, updateOrderStatus, updatePaymentStatus, deleteOrder } from "@/src/lib/admin-api";
 import { StatusBadge } from "@/src/components/admin/StatusBadge";
+import { useConfirm } from "@/src/components/admin/ConfirmDialog";
 import { formatPrice, formatDate, safeImage, cn } from "@/src/lib/utils";
 import { SITE_NAME } from "@/src/lib/constants";
 import type { Order } from "@/src/lib/admin-api";
@@ -24,6 +25,7 @@ const paymentStatuses = ["pending", "paid", "failed", "refunded"];
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const { confirm, dialog } = useConfirm();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -49,7 +51,8 @@ export default function OrderDetailPage() {
   const handleStatusChange = async (newStatus: string) => {
     if (!order || order.status === newStatus) return;
     if (newStatus === "cancelled") {
-      if (!window.confirm("Are you sure you want to cancel this order? This action cannot be undone.")) return;
+      const ok = await confirm("Cancel Order", "Are you sure you want to cancel this order? This action cannot be undone.", { confirmLabel: "Cancel Order", danger: true });
+      if (!ok) return;
     }
     setUpdating(true);
     try {
@@ -222,7 +225,8 @@ export default function OrderDetailPage() {
 
   const handleDelete = async () => {
     if (!order) return;
-    if (!window.confirm("Are you sure you want to permanently delete this order? This action cannot be undone.")) return;
+    const ok = await confirm("Delete Order", "Are you sure you want to permanently delete this order? This action cannot be undone.", { confirmLabel: "Delete", danger: true });
+    if (!ok) return;
     setUpdating(true);
     try {
       await deleteOrder(order.id);
@@ -251,6 +255,7 @@ export default function OrderDetailPage() {
 
   return (
     <div>
+      {dialog}
       <button
         onClick={() => router.push("/admin/orders")}
         className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 mb-6 transition-colors"

@@ -39,12 +39,20 @@ export async function adminFetcher<T>(url: string, options?: RequestInit): Promi
 
 // Dashboard
 export interface DashboardStats {
-  stats: { totalProducts: number; totalOrders: number; totalUsers: number; totalRevenue: number };
+  stats: {
+    totalProducts: number; totalOrders: number; totalUsers: number; totalRevenue: number;
+    pendingOrders: number; unreadMessages: number; pendingBugs: number;
+  };
   recentOrders: unknown[];
   lowStockProducts: unknown[];
+  revenueData: { date: string; revenue: number; orders: number }[];
 }
-export async function fetchDashboard(): Promise<DashboardStats> {
-  const res = await adminFetcher<DashboardStats>("/admin/dashboard");
+export async function fetchDashboard(params?: { from?: string; to?: string }): Promise<DashboardStats> {
+  const qs = new URLSearchParams();
+  if (params?.from) qs.set("from", params.from);
+  if (params?.to) qs.set("to", params.to);
+  const q = qs.toString();
+  const res = await adminFetcher<DashboardStats>(`/admin/dashboard${q ? `?${q}` : ""}`);
   return res.data;
 }
 
@@ -55,11 +63,12 @@ export interface OrderItem {
 export interface Order {
   id: string; user_id: string; status: string; subtotal: number; shipping_cost: number; tax: number; total: number; shipping_address: Record<string,string>; payment_method: string; payment_status: string; created_at: string; order_items?: OrderItem[]; profiles?: { name: string; email: string };
 }
-export async function fetchOrders(params?: { page?: number; limit?: number; status?: string }): Promise<{ orders: Order[]; meta: { total: number; page: number; limit: number; totalPages: number } }> {
+export async function fetchOrders(params?: { page?: number; limit?: number; status?: string; search?: string }): Promise<{ orders: Order[]; meta: { total: number; page: number; limit: number; totalPages: number } }> {
   const qs = new URLSearchParams();
   if (params?.page) qs.set("page", String(params.page));
   if (params?.limit) qs.set("limit", String(params.limit));
   if (params?.status) qs.set("status", params.status);
+  if (params?.search) qs.set("search", params.search);
   const q = qs.toString();
   const res = await adminFetcher<Order[]>(`/admin/orders${q ? `?${q}` : ""}`);
   return { orders: res.data || [], meta: res.meta! };

@@ -5,6 +5,7 @@ import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { fetchCategories } from "@/src/lib/api";
 import { CategoryForm, type CategoryFormData } from "@/src/components/admin/CategoryForm";
+import { useConfirm } from "@/src/components/admin/ConfirmDialog";
 import { adminFetcher } from "@/src/lib/admin-api";
 
 interface CategoryItem {
@@ -17,6 +18,7 @@ interface CategoryItem {
 }
 
 export default function CategoriesPage() {
+  const { confirm, dialog } = useConfirm();
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -80,7 +82,8 @@ export default function CategoriesPage() {
   };
 
   const handleDelete = async (category: CategoryItem) => {
-    if (!window.confirm(`Are you sure you want to delete "${category.name}"?`)) return;
+    const ok = await confirm("Delete Category", `Are you sure you want to delete "${category.name}"?`, { confirmLabel: "Delete", danger: true });
+    if (!ok) return;
     try {
       await adminFetcher(`/categories/${category.slug}`, { method: "DELETE" });
       await load();
@@ -117,6 +120,7 @@ export default function CategoriesPage() {
 
   return (
     <div>
+      {dialog}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-serif text-2xl font-bold">Categories</h1>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -8,16 +8,23 @@ import {
   PanelRightClose, PanelRightOpen, Sun, Moon, X, Bug, Settings,
 } from "lucide-react";
 import { useTheme } from "@/src/providers/ThemeProvider";
+import { fetchDashboard } from "@/src/lib/admin-api";
+
+interface BadgeCounts {
+  pendingOrders: number;
+  unreadMessages: number;
+  pendingBugs: number;
+}
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/categories", label: "Categories", icon: ShoppingCart },
-  { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
+  { href: "/admin/orders", label: "Orders", icon: ShoppingCart, badge: "pendingOrders" as const },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/reviews", label: "Reviews", icon: Star },
-  { href: "/admin/contact-messages", label: "Messages", icon: Mail },
-  { href: "/admin/bug-reports", label: "Bug Reports", icon: Bug },
+  { href: "/admin/contact-messages", label: "Messages", icon: Mail, badge: "unreadMessages" as const },
+  { href: "/admin/bug-reports", label: "Bug Reports", icon: Bug, badge: "pendingBugs" as const },
   { href: "/admin/site-settings", label: "Site Settings", icon: Settings },
 ];
 
@@ -31,6 +38,26 @@ export function AdminSidebar({ open = false, onClose }: AdminSidebarProps) {
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const [badges, setBadges] = useState<BadgeCounts>({ pendingOrders: 0, unreadMessages: 0, pendingBugs: 0 });
+
+  const loadBadges = useCallback(async () => {
+    try {
+      const data = await fetchDashboard();
+      setBadges({
+        pendingOrders: data.stats.pendingOrders,
+        unreadMessages: data.stats.unreadMessages,
+        pendingBugs: data.stats.pendingBugs,
+      });
+    } catch {
+      // silently fail
+    }
+  }, []);
+
+  useEffect(() => {
+    loadBadges();
+    const interval = setInterval(loadBadges, 30000);
+    return () => clearInterval(interval);
+  }, [loadBadges]);
 
   useEffect(() => {
     if (open) {
@@ -55,6 +82,8 @@ export function AdminSidebar({ open = false, onClose }: AdminSidebarProps) {
         : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
     }`;
 
+  const totalBadges = badges.pendingOrders + badges.unreadMessages + badges.pendingBugs;
+
   return (
     <>
       {onClose && (
@@ -72,6 +101,11 @@ export function AdminSidebar({ open = false, onClose }: AdminSidebarProps) {
             </Link>
           )}
           <div className="flex items-center gap-1">
+            {!collapsed && totalBadges > 0 && (
+              <span className="mr-1 min-w-[20px] h-5 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold px-1.5">
+                {totalBadges > 99 ? "99+" : totalBadges}
+              </span>
+            )}
             {onClose && open && (
               <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors lg:hidden">
                 <X className="w-4 h-4" />
@@ -83,12 +117,27 @@ export function AdminSidebar({ open = false, onClose }: AdminSidebarProps) {
           </div>
         </div>
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {navItems.map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href} onClick={handleNavClick} className={linkClass(href)} title={collapsed ? label : undefined}>
-              <Icon className="w-5 h-5 shrink-0" />
-              {!collapsed && <span>{label}</span>}
-            </Link>
-          ))}
+          {navItems.map(({ href, label, icon: Icon, badge }) => {
+            const count = badge ? badges[badge] : 0;
+            return (
+              <Link key={href} href={href} onClick={handleNavClick} className={linkClass(href)} title={collapsed ? label : undefined}>
+                <Icon className="w-5 h-5 shrink-0" />
+                {!collapsed && (
+                  <>
+                    <span className="flex-1">{label}</span>
+                    {count > 0 && (
+                      <span className="min-w-[20px] h-5 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold px-1.5">
+                        {count > 99 ? "99+" : count}
+                      </span>
+                    )}
+                  </>
+                )}
+                {collapsed && count > 0 && (
+                  <span className="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-500" />
+                )}
+              </Link>
+            );
+          })}
         </nav>
         <div className="p-3 border-t border-zinc-200 dark:border-zinc-700 space-y-1">
           <button onClick={toggleTheme} className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 w-full transition-colors">
