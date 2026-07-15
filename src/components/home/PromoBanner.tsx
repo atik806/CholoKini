@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { ArrowRight, Clock } from "lucide-react";
 import Link from "next/link";
+import { API_BASE } from "@/src/lib/constants";
 
 const SceneContainer = dynamic(
   () => import("@/src/components/three/SceneContainer").then((m) => ({ default: m.SceneContainer })),
@@ -15,7 +17,38 @@ const ParticleField = dynamic(
   { ssr: false }
 );
 
+interface PromoBannerData {
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  button_text?: string;
+  button_link?: string;
+  enabled?: boolean;
+}
+
 export function PromoBanner() {
+  const [promo, setPromo] = useState<PromoBannerData>({
+    badge: "Limited Time Offer",
+    title: "Summer Sale — Up to 40% Off",
+    subtitle: "Exclusive discounts on our most-loved products.",
+    button_text: "Shop Sale",
+    button_link: "/shop",
+    enabled: true,
+  });
+
+  useEffect(() => {
+    fetch(`${API_BASE}/site-settings/promo_banner`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && data.enabled !== false) {
+          setPromo(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  if (!promo.enabled) return null;
+
   return (
     <section className="py-12 md:py-16">
       <div className="container">
@@ -42,7 +75,7 @@ export function PromoBanner() {
               className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white text-sm font-medium px-4 py-1.5 rounded-full mb-6 border border-white/10"
             >
               <Clock className="w-3.5 h-3.5" />
-              Limited Time Offer
+              {promo.badge}
             </motion.div>
 
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
@@ -54,7 +87,7 @@ export function PromoBanner() {
                   transition={{ delay: 0.1 }}
                   className="font-serif text-3xl md:text-4xl font-bold text-white mb-3"
                 >
-                  Summer Sale &mdash; Up to 40% Off
+                  {promo.title}
                 </motion.h2>
                 <motion.p
                   initial={{ opacity: 0, y: 10 }}
@@ -63,7 +96,7 @@ export function PromoBanner() {
                   transition={{ delay: 0.2 }}
                   className="text-emerald-100/80 text-sm leading-relaxed max-w-md"
                 >
-                  Exclusive discounts on our most-loved products.
+                  {promo.subtitle}
                 </motion.p>
               </div>
               <motion.div
@@ -73,23 +106,11 @@ export function PromoBanner() {
                 transition={{ delay: 0.3 }}
                 className="flex items-center gap-3"
               >
-                <div className="hidden sm:flex items-center gap-3">
-                  {["02", "14", "36"].map((val, i) => (
-                    <div key={i} className="text-center">
-                      <div className="w-14 h-14 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center">
-                        <span className="text-xl font-bold text-white">{val}</span>
-                      </div>
-                      <p className="text-[10px] text-emerald-200/70 mt-1 uppercase tracking-wider">
-                        {["Days", "Hrs", "Min"][i]}
-                      </p>
-                    </div>
-                  ))}
-                </div>
                 <Link
-                  href="/shop"
+                  href={promo.button_link || "/shop"}
                   className="inline-flex items-center gap-2 bg-white text-primary px-8 py-3.5 rounded-xl font-medium hover:bg-emerald-50 transition-all shadow-xl hover:shadow-white/20 hover:-translate-y-0.5"
                 >
-                  Shop Sale <ArrowRight className="w-4 h-4" />
+                  {promo.button_text} <ArrowRight className="w-4 h-4" />
                 </Link>
               </motion.div>
             </div>

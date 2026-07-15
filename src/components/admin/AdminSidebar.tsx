@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Star, Mail, LogOut,
-  PanelRightClose, PanelRightOpen, Sun, Moon, X, Bug,
+  PanelRightClose, PanelRightOpen, Sun, Moon, X, Bug, Settings,
 } from "lucide-react";
 import { useTheme } from "@/src/providers/ThemeProvider";
 
@@ -18,6 +18,7 @@ const navItems = [
   { href: "/admin/reviews", label: "Reviews", icon: Star },
   { href: "/admin/contact-messages", label: "Messages", icon: Mail },
   { href: "/admin/bug-reports", label: "Bug Reports", icon: Bug },
+  { href: "/admin/site-settings", label: "Site Settings", icon: Settings },
 ];
 
 interface AdminSidebarProps {
