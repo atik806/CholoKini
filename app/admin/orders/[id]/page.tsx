@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, Check, Download } from "lucide-react";
-import { fetchOrder, updateOrderStatus, updatePaymentStatus } from "@/src/lib/admin-api";
+import { ArrowLeft, Loader2, Check, Download, Trash2 } from "lucide-react";
+import { fetchOrder, updateOrderStatus, updatePaymentStatus, deleteOrder } from "@/src/lib/admin-api";
 import { StatusBadge } from "@/src/components/admin/StatusBadge";
 import { formatPrice, formatDate, safeImage, cn } from "@/src/lib/utils";
 import { SITE_NAME } from "@/src/lib/constants";
@@ -220,6 +220,19 @@ export default function OrderDetailPage() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!order) return;
+    if (!window.confirm("Are you sure you want to permanently delete this order? This action cannot be undone.")) return;
+    setUpdating(true);
+    try {
+      await deleteOrder(order.id);
+      router.push("/admin/orders");
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to delete order");
+      setUpdating(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -387,6 +400,14 @@ export default function OrderDetailPage() {
                 Updating...
               </div>
             )}
+            <button
+              onClick={handleDelete}
+              disabled={updating}
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete Order
+            </button>
           </div>
         </div>
       </div>
