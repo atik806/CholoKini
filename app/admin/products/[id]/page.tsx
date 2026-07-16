@@ -59,7 +59,7 @@ export default function EditProductPage() {
     if (!product) return;
     setSaving(true);
     try {
-      const body = {
+      const body: Record<string, unknown> = {
         name: values.name,
         description: values.description,
         price: Number(values.price),
@@ -67,18 +67,24 @@ export default function EditProductPage() {
         category_id: values.category_id,
         images: values.images.split(",").map((s) => s.trim()).filter(Boolean),
         stock: values.stock,
-        tags: values.tags.split(",").map((s) => s.trim()).filter(Boolean),
-        sizes: values.sizes.split(",").map((s) => s.trim()).filter(Boolean),
-        colors: values.colors
+        is_new: values.is_new,
+        is_featured: values.is_featured,
+      };
+      if (values.tags.trim()) {
+        body.tags = values.tags.split(",").map((s) => s.trim()).filter(Boolean);
+      }
+      if (values.sizes.trim()) {
+        body.sizes = values.sizes.split(",").map((s) => s.trim()).filter(Boolean);
+      }
+      if (values.colors.trim()) {
+        body.colors = values.colors
           .split(",")
           .map((s) => {
             const [name, hex] = s.trim().split(":");
             return name && hex ? { name: name.trim(), hex: hex.trim() } : null;
           })
-          .filter(Boolean) as { name: string; hex: string }[],
-        is_new: values.is_new,
-        is_featured: values.is_featured,
-      };
+          .filter(Boolean);
+      }
       await adminFetcher(`/products/${product.id}`, {
         method: "PATCH",
         body: JSON.stringify(body),
