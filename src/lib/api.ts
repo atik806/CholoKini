@@ -64,7 +64,7 @@ function mapProduct(p: BackendProduct): Product {
 
 function mapCategory(c: BackendCategory): Category {
   return {
-    id: c.slug,
+    id: c.id,
     name: c.name,
     slug: c.slug,
     image: c.image_url,

@@ -32,7 +32,13 @@ export async function adminFetcher<T>(url: string, options?: RequestInit): Promi
       if (typeof window !== "undefined") window.location.href = "/admin/login";
     }
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || `HTTP ${res.status}`);
+    let msg = err.message || `HTTP ${res.status}`;
+    if (err.errors && Array.isArray(err.errors) && err.errors.length > 0) {
+      msg = err.errors.map((e: { field?: string; message?: string }) =>
+        e.field ? `${e.field}: ${e.message}` : e.message
+      ).join("; ");
+    }
+    throw new Error(msg);
   }
   return res.json();
 }

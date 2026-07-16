@@ -53,6 +53,8 @@ export function ProductForm({ initialValues, onSubmit, loading, categories, mode
     else if (form.description.trim().length < 10) errs.description = "Description must be at least 10 characters";
     if (form.price === "" || Number(form.price) <= 0) errs.price = "Price must be greater than 0";
     if (!form.category_id) errs.category_id = "Category is required";
+    const parsedImages = form.images.split(",").map((s) => s.trim()).filter(Boolean);
+    if (parsedImages.length === 0) errs.images = "At least one product image is required";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -167,11 +169,12 @@ export function ProductForm({ initialValues, onSubmit, loading, categories, mode
       </div>
 
       <div>
-        <label className={labelClass}>Product Images</label>
+        <label className={labelClass}>Product Images *</label>
         <ImageUpload
           value={form.images ? form.images.split(",").map((s) => s.trim()).filter(Boolean) : []}
           onChange={(urls) => update("images", urls.join(", "))}
         />
+        {errors.images && <p className="text-xs text-red-500 mt-1">{errors.images}</p>}
       </div>
 
       <div>
