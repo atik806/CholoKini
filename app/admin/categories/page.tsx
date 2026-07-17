@@ -27,8 +27,8 @@ export default function CategoriesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const load = async () => {
-    setLoading(true);
+  const load = async (showSpinner = false) => {
+    if (showSpinner) setLoading(true);
     try {
       const data = await fetchCategories();
       setCategories(data);
@@ -62,6 +62,8 @@ export default function CategoriesPage() {
         body: JSON.stringify(data),
       });
       await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create category");
     } finally {
       setSubmitting(false);
     }
@@ -76,6 +78,8 @@ export default function CategoriesPage() {
         body: JSON.stringify(data),
       });
       await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update category");
     } finally {
       setSubmitting(false);
     }
@@ -85,10 +89,10 @@ export default function CategoriesPage() {
     const ok = await confirm("Delete Category", `Are you sure you want to delete "${category.name}"?`, { confirmLabel: "Delete", danger: true });
     if (!ok) return;
     try {
-      await adminFetcher(`/categories/${category.slug}`, { method: "DELETE" });
+      await adminFetcher(`/categories/${category.id}`, { method: "DELETE" });
       await load();
-    } catch {
-      alert("Failed to delete category");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete category");
     }
   };
 
@@ -100,7 +104,7 @@ export default function CategoriesPage() {
 
   const openEdit = (category: CategoryItem) => {
     setEditingCategory(category);
-    setEditingId(category.slug);
+    setEditingId(category.id);
     setFormOpen(true);
   };
 
