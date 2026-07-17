@@ -33,13 +33,16 @@ export function ImageUpload({ value, onChange, maxImages = 8 }: ImageUploadProps
     setUploading(true);
     setError("");
     const newUrls: string[] = [];
+    const errors: string[] = [];
+    const token = getToken();
 
-    for (const file of Array.from(files)) {
-      if (value.length + newUrls.length >= maxImages) break;
-      const formData = new FormData();
-      formData.append("file", file);
-      try {
-        const token = getToken();
+    const remainingSlots = maxImages - value.length;
+    const filesToUpload = Array.from(files).slice(0, remainingSlots);
+
+    const results = await Promise.allSettled(
+      filesToUpload.map(async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
         const res = await fetch(`${API_BASE}/upload`, {
           method: "POST",
           headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -47,14 +50,25 @@ export function ImageUpload({ value, onChange, maxImages = 8 }: ImageUploadProps
         });
         const data = await res.json();
         if (!res.ok) {
-          setError(data?.message || data?.data?.message || `Upload failed (${res.status})`);
-          continue;
+          throw new Error(data?.message || data?.data?.message || `Upload failed (${res.status})`);
         }
         const url = data.data?.url || data.url;
-        if (url) newUrls.push(url);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Upload failed");
+        if (!url) throw new Error("No URL returned from upload");
+        return url;
+      })
+    );
+
+    for (let i = 0; i < results.length; i++) {
+      const result = results[i];
+      if (result.status === "fulfilled") {
+        newUrls.push(result.value);
+      } else {
+        errors.push(result.reason?.message || `Upload ${i + 1} failed`);
       }
+    }
+
+    if (errors.length > 0) {
+      setError(errors.join("; "));
     }
 
     if (newUrls.length > 0) {
