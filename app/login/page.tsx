@@ -27,7 +27,8 @@ function getOAuthError(
   if (errorType === "oauth_failed") {
     const msg = desc ? decodeURIComponent(desc) : "";
     if (msg.includes("No session found") || msg.includes("no_session")) {
-      return "Google sign-in failed: session not created. Please ensure the Supabase redirect URL includes http://localhost:3000/auth/callback and try again.";
+      const origin = typeof window !== "undefined" ? window.location.origin : "";
+      return `Google sign-in failed: session not created. Please ensure the Supabase redirect URL includes ${origin}/auth/callback in your Supabase Dashboard (Authentication > URL Configuration > Redirect URLs).`;
     }
     return "Google sign-in failed. Please try again.";
   }

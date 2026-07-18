@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Sparkles, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { Sparkles, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/src/store/useCartStore";
@@ -10,7 +10,6 @@ import { useIsLoggedIn, useAuthHydrated, useAuthStore } from "@/src/store/useAut
 import { Button } from "@/src/components/ui/Button";
 import { Breadcrumbs } from "@/src/components/ui/Breadcrumbs";
 import { EmptyState } from "@/src/components/ui/EmptyState";
-import { CheckoutStepper } from "@/src/components/checkout/CheckoutStepper";
 import { ShippingForm } from "@/src/components/checkout/ShippingForm";
 import type { ShippingFormValues } from "@/src/components/checkout/ShippingForm";
 import { PaymentForm } from "@/src/components/checkout/PaymentForm";
@@ -19,18 +18,11 @@ import { OrderComplete } from "@/src/components/checkout/OrderComplete";
 import { API_BASE, type DeliveryZone } from "@/src/lib/constants";
 import { authFetch } from "@/src/lib/auth-api";
 
-const initialShipping: ShippingFormValues = {
-  firstName: "", lastName: "", email: "", phone: "",
-  address: "", city: "", zipCode: "",
-};
-
 export default function CheckoutPage() {
   const router = useRouter();
   const authHydrated = useAuthHydrated();
   const isLoggedIn = useIsLoggedIn();
   const user = useAuthStore((s) => s.user);
-  const session = useAuthStore((s) => s.session);
-  const [step, setStep] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [placing, setPlacing] = useState(false);
   const [placeError, setPlaceError] = useState("");
@@ -54,7 +46,12 @@ export default function CheckoutPage() {
     }
   }, [authHydrated, isLoggedIn, router]);
 
-  const validateShipping = useCallback(() => {
+  const outOfStockInCart = useMemo(
+    () => items.filter((i) => i.product.stock === "out-of-stock"),
+    [items],
+  );
+
+  const handlePlaceOrder = useCallback(async () => {
     const errs: Record<string, string> = {};
     if (!shipping.firstName.trim()) errs.firstName = "Required";
     if (!shipping.lastName.trim()) errs.lastName = "Required";
@@ -64,40 +61,9 @@ export default function CheckoutPage() {
     if (!shipping.address.trim()) errs.address = "Required";
     if (!shipping.city.trim()) errs.city = "Required";
     if (!shipping.zipCode.trim()) errs.zipCode = "Required";
-    return errs;
-  }, [shipping]);
-
-  const validatePayment = useCallback(() => ({} as Record<string, string>), []);
-
-  const handleNext = useCallback(async () => {
-    const errs = step === 0 ? validateShipping() : validatePayment();
     setErrors(errs);
-    if (Object.keys(errs).length === 0) {
-      if (step === 0 && session?.access_token) {
-        try {
-          const res = await authFetch(`${API_BASE}/auth/profile`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ shipping_address: shipping }),
-          });
-          if (res.ok) {
-            const data = await res.json();
-            if (data?.data?.shipping_address) {
-              useAuthStore.getState().updateUser({ shipping_address: data.data.shipping_address });
-            }
-          }
-        } catch {}
-      }
-      setStep((s) => s + 1);
-    }
-  }, [step, validateShipping, validatePayment, session, shipping]);
+    if (Object.keys(errs).length > 0) return;
 
-  const outOfStockInCart = useMemo(
-    () => items.filter((i) => i.product.stock === "out-of-stock"),
-    [items],
-  );
-
-  const handlePlaceOrder = useCallback(async () => {
     if (outOfStockInCart.length > 0) {
       setPlaceError(
         `Remove out-of-stock items before checkout: ${outOfStockInCart.map((i) => i.product.name).join(", ")}`,
@@ -188,62 +154,45 @@ export default function CheckoutPage() {
         </p>
       )}
 
-      <CheckoutStepper step={step} />
+      <div className="max-w-lg mx-auto space-y-10">
+        <section>
+          <ShippingForm
+            values={shipping}
+            onChange={setShipping}
+            errors={errors}
+            deliveryZone={deliveryZone}
+            onDeliveryZoneChange={setDeliveryZone}
+          />
+        </section>
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={step}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.25 }}
-          className="max-w-lg mx-auto"
-        >
-          {step === 0 && (
-            <ShippingForm
-              values={shipping}
-              onChange={setShipping}
-              errors={errors}
-              deliveryZone={deliveryZone}
-              onDeliveryZoneChange={setDeliveryZone}
-            />
-          )}
-          {step === 1 && <PaymentForm />}
-          {step === 2 && (
-            <ReviewOrder
-              shipping={shipping}
-              deliveryZone={deliveryZone}
-            />
-          )}
-        </motion.div>
-      </AnimatePresence>
+        <section>
+          <PaymentForm />
+        </section>
+
+        <section>
+          <ReviewOrder
+            shipping={shipping}
+            deliveryZone={deliveryZone}
+          />
+        </section>
+      </div>
 
       <div className="max-w-lg mx-auto mt-8 space-y-3">
         {placeError && (
           <p className="text-sm text-red-500 text-center">{placeError}</p>
         )}
-        <div className="flex items-center justify-between">
-          {step > 0 ? (
-            <Button variant="outline" onClick={() => { setErrors({}); setStep(step - 1); }}>
-              <ChevronLeft className="w-4 h-4" /> Back
-            </Button>
+        <Button
+          className="w-full"
+          size="lg"
+          onClick={handlePlaceOrder}
+          disabled={placing || outOfStockInCart.length > 0}
+        >
+          {placing ? (
+            <><Loader2 className="w-5 h-5 animate-spin" /> Placing Order...</>
           ) : (
-            <div />
+            <>Place Order <Sparkles className="w-5 h-5" /></>
           )}
-          {step < 2 ? (
-            <Button onClick={() => handleNext()}>
-              Continue <ChevronRight className="w-4 h-4" />
-            </Button>
-          ) : (
-            <Button onClick={handlePlaceOrder} disabled={placing || outOfStockInCart.length > 0}>
-              {placing ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Placing...</>
-              ) : (
-                <>Place Order <Sparkles className="w-4 h-4" /></>
-              )}
-            </Button>
-          )}
-        </div>
+        </Button>
       </div>
     </motion.div>
   );
