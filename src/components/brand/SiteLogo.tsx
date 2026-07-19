@@ -9,9 +9,9 @@ const sizeMap: Record<
   { width: number; height: number; className: string; imageClass: string }
 > = {
   header: {
-    width: 64,
-    height: 64,
-    className: "h-14 w-14 md:h-16 md:w-16",
+    width: 48,
+    height: 48,
+    className: "h-10 w-10 md:h-12 md:w-12",
     imageClass: "object-contain",
   },
   mobile: {
