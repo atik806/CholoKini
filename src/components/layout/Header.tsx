@@ -179,8 +179,6 @@ export const Header = memo(function Header() {
               <Phone className="w-3 h-3" />
               01302228993
             </span>
-            <span className="text-white/40">|</span>
-            <span>Free delivery on orders over ৳500</span>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/track-order" className="hover:text-white/80 transition-colors">Track Order</Link>

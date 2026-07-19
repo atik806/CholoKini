@@ -1,15 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Truck, ShieldCheck, Headphones, RotateCcw } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-
-const trustBadges = [
-  { icon: Truck, label: "Free Delivery over ৳500" },
-  { icon: ShieldCheck, label: "Secure Payment" },
-  { icon: Headphones, label: "24/7 Support" },
-  { icon: RotateCcw, label: "Easy Returns" },
-];
 
 export function HeroSection() {
   return (
@@ -72,27 +65,7 @@ export function HeroSection() {
           </motion.div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.55 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4"
-        >
-          {trustBadges.map(({ icon: Icon, label }, i) => (
-            <motion.div
-              key={label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 + i * 0.08 }}
-              className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/10"
-            >
-              <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-                <Icon className="w-4 h-4 text-[#f0a11a]" />
-              </div>
-              <span className="text-white/80 text-xs font-medium leading-tight">{label}</span>
-            </motion.div>
-          ))}
-        </motion.div>
+
       </div>
     </section>
   );

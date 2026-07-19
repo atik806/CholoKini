@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
-import { Heart, ShoppingBag, Minus, Plus, Truck, ShieldCheck, RotateCcw, Share2 } from "lucide-react";
+import { Heart, ShoppingBag, Minus, Plus, Share2 } from "lucide-react";
 import { ProductGallery } from "@/src/components/product/ProductGallery";
 import { ProductGrid } from "@/src/components/product/ProductGrid";
 import { ReviewSection } from "@/src/components/product/ReviewSection";
@@ -207,21 +207,7 @@ export default function ProductDetailPage() {
             </button>
           </div>
 
-          {/* Trust Badges */}
-          <div className="mt-6 grid grid-cols-3 gap-3">
-            <div className="flex flex-col items-center text-center gap-1.5 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50">
-              <Truck className="w-4 h-4 text-[#0b2c5f] dark:text-primary-light" />
-              <span className="text-[11px] text-zinc-500 dark:text-zinc-400">Free Delivery</span>
-            </div>
-            <div className="flex flex-col items-center text-center gap-1.5 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50">
-              <ShieldCheck className="w-4 h-4 text-[#0b2c5f] dark:text-primary-light" />
-              <span className="text-[11px] text-zinc-500 dark:text-zinc-400">Secure Payment</span>
-            </div>
-            <div className="flex flex-col items-center text-center gap-1.5 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50">
-              <RotateCcw className="w-4 h-4 text-[#0b2c5f] dark:text-primary-light" />
-              <span className="text-[11px] text-zinc-500 dark:text-zinc-400">Easy Returns</span>
-            </div>
-          </div>
+
 
           <div className="mt-4 text-xs text-zinc-400 dark:text-zinc-500">
             Tags: {product.tags.map((t) => `#${t}`).join(", ")}

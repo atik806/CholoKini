@@ -1,13 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Truck, ShieldCheck, Headphones, RotateCcw, CreditCard, Clock } from "lucide-react";
+import { CreditCard, Clock } from "lucide-react";
 
 const features = [
-  { icon: Truck, title: "Free Delivery", description: "On orders over ৳500" },
-  { icon: ShieldCheck, title: "Secure Payment", description: "100% secure checkout" },
-  { icon: Headphones, title: "24/7 Support", description: "Dedicated support team" },
-  { icon: RotateCcw, title: "Easy Returns", description: "7-day return policy" },
   { icon: CreditCard, title: "COD Available", description: "Pay on delivery" },
   { icon: Clock, title: "Fast Shipping", description: "1-3 business days" },
 ];
