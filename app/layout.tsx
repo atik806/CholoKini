@@ -19,8 +19,11 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Dhaka Wholesale — Your Trusted Wholesale Marketplace",
-  description: "Your trusted wholesale marketplace for quality products at competitive prices",
+  title: {
+    default: "Dhaka Wholesale — Your Trusted Wholesale Marketplace",
+    template: "%s | Dhaka Wholesale",
+  },
+  description: "Your trusted wholesale marketplace for quality products at competitive prices. Shop electronics, fashion, home goods & more with free delivery across Bangladesh.",
   metadataBase: new URL("https://dhakawholesale.com"),
   icons: {
     icon: [
@@ -32,11 +35,18 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Dhaka Wholesale — Your Trusted Wholesale Marketplace",
-    description: "Your trusted wholesale marketplace for quality products at competitive prices",
+    description: "Your trusted wholesale marketplace for quality products at competitive prices.",
     url: "https://dhakawholesale.com",
     siteName: "Dhaka Wholesale",
     images: [{ url: "/logo.png", width: 1024, height: 1024, alt: "Dhaka Wholesale" }],
     type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Dhaka Wholesale — Your Trusted Wholesale Marketplace",
+    description: "Your trusted wholesale marketplace for quality products at competitive prices.",
+    images: ["/logo.png"],
   },
 };
 
@@ -51,7 +61,7 @@ export default function RootLayout({
         <ThemeInit />
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-xl focus:text-sm focus:font-medium"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg focus:text-sm focus:font-medium"
         >
           Skip to main content
         </a>

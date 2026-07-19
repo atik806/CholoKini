@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles, Loader2, Truck, ShieldCheck, CreditCard } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/src/store/useCartStore";
@@ -15,8 +15,9 @@ import type { ShippingFormValues } from "@/src/components/checkout/ShippingForm"
 import { PaymentForm } from "@/src/components/checkout/PaymentForm";
 import { ReviewOrder } from "@/src/components/checkout/ReviewOrder";
 import { OrderComplete } from "@/src/components/checkout/OrderComplete";
-import { API_BASE, type DeliveryZone } from "@/src/lib/constants";
+import { API_BASE, DELIVERY_CHARGES, type DeliveryZone } from "@/src/lib/constants";
 import { authFetch } from "@/src/lib/auth-api";
+import { formatPrice } from "@/src/lib/utils";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -50,6 +51,12 @@ export default function CheckoutPage() {
     () => items.filter((i) => i.product.stock === "out-of-stock"),
     [items],
   );
+
+  const orderSummary = useMemo(() => {
+    const subtotal = items.reduce((sum, i) => sum + (i.product.price || 0) * i.quantity, 0);
+    const shipping_cost = DELIVERY_CHARGES[deliveryZone];
+    return { subtotal, shipping: shipping_cost, total: subtotal + shipping_cost };
+  }, [items, deliveryZone]);
 
   const handlePlaceOrder = useCallback(async () => {
     const errs: Record<string, string> = {};
@@ -109,7 +116,7 @@ export default function CheckoutPage() {
   if (!authHydrated || !isLoggedIn) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#0b2c5f]" />
       </div>
     );
   }
@@ -146,53 +153,103 @@ export default function CheckoutPage() {
     >
       <Breadcrumbs items={[{ label: "Checkout" }]} />
 
+      {/* Checkout Steps */}
+      <div className="flex items-center justify-center gap-4 mb-10">
+        {[
+          { label: "Shipping", icon: Truck },
+          { label: "Payment", icon: CreditCard },
+          { label: "Review", icon: ShieldCheck },
+        ].map(({ label, icon: Icon }, i) => (
+          <div key={label} className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-[#0b2c5f] dark:bg-primary flex items-center justify-center">
+              <Icon className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-sm font-medium hidden sm:block">{label}</span>
+            {i < 2 && <div className="w-8 h-px bg-zinc-200 dark:bg-zinc-700 mx-2 hidden sm:block" />}
+          </div>
+        ))}
+      </div>
+
       {outOfStockInCart.length > 0 && (
-        <p className="max-w-lg mx-auto mb-6 text-sm text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl px-4 py-3 text-center">
+        <p className="max-w-lg mx-auto mb-6 text-sm text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg px-4 py-3 text-center">
           Some items in your cart are out of stock. Remove them in{" "}
           <Link href="/cart" className="underline font-medium">your cart</Link>{" "}
           to continue.
         </p>
       )}
 
-      <div className="max-w-lg mx-auto space-y-10">
-        <section>
-          <ShippingForm
-            values={shipping}
-            onChange={setShipping}
-            errors={errors}
-            deliveryZone={deliveryZone}
-            onDeliveryZoneChange={setDeliveryZone}
-          />
-        </section>
+      <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="lg:col-span-2 space-y-8">
+          <section>
+            <ShippingForm
+              values={shipping}
+              onChange={setShipping}
+              errors={errors}
+              deliveryZone={deliveryZone}
+              onDeliveryZoneChange={setDeliveryZone}
+            />
+          </section>
 
-        <section>
-          <PaymentForm />
-        </section>
+          <section>
+            <PaymentForm />
+          </section>
 
-        <section>
-          <ReviewOrder
-            shipping={shipping}
-            deliveryZone={deliveryZone}
-          />
-        </section>
-      </div>
+          <section>
+            <ReviewOrder
+              shipping={shipping}
+              deliveryZone={deliveryZone}
+            />
+          </section>
+        </div>
 
-      <div className="max-w-lg mx-auto mt-8 space-y-3">
-        {placeError && (
-          <p className="text-sm text-red-500 text-center">{placeError}</p>
-        )}
-        <Button
-          className="w-full"
-          size="lg"
-          onClick={handlePlaceOrder}
-          disabled={placing || outOfStockInCart.length > 0}
-        >
-          {placing ? (
-            <><Loader2 className="w-5 h-5 animate-spin" /> Placing Order...</>
-          ) : (
-            <>Place Order <Sparkles className="w-5 h-5" /></>
-          )}
-        </Button>
+        {/* Order Summary Sidebar */}
+        <div className="lg:col-span-1">
+          <div className="sticky top-24 bg-white dark:bg-zinc-800 rounded-xl border border-zinc-100 dark:border-zinc-700/50 p-5 shadow-sm">
+            <h3 className="font-semibold mb-4">Order Summary</h3>
+            <div className="space-y-2 text-sm max-h-60 overflow-y-auto mb-4">
+              {items.map((item) => (
+                <div key={`${item.product.id}-${item.selectedSize}-${item.selectedColor}`} className="flex justify-between">
+                  <span className="text-zinc-500 dark:text-zinc-400 truncate mr-2">
+                    {item.product.name} × {item.quantity}
+                  </span>
+                  <span className="shrink-0">{formatPrice(item.product.price * item.quantity)}</span>
+                </div>
+              ))}
+            </div>
+            <div className="border-t border-zinc-100 dark:border-zinc-700 pt-3 space-y-2 text-sm">
+              <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
+                <span>Subtotal</span>
+                <span>{formatPrice(orderSummary.subtotal)}</span>
+              </div>
+              <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
+                <span>Delivery</span>
+                <span>{formatPrice(orderSummary.shipping)}</span>
+              </div>
+              <div className="border-t border-zinc-100 dark:border-zinc-700 pt-2 flex justify-between font-semibold text-base">
+                <span>Total</span>
+                <span>{formatPrice(orderSummary.total)}</span>
+              </div>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              {placeError && (
+                <p className="text-sm text-red-500 text-center">{placeError}</p>
+              )}
+              <Button
+                className="w-full"
+                size="lg"
+                onClick={handlePlaceOrder}
+                disabled={placing || outOfStockInCart.length > 0}
+              >
+                {placing ? (
+                  <><Loader2 className="w-5 h-5 animate-spin" /> Placing Order...</>
+                ) : (
+                  <>Place Order — {formatPrice(orderSummary.total)} <Sparkles className="w-5 h-5" /></>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
     </motion.div>
   );

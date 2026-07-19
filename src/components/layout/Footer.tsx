@@ -2,13 +2,12 @@
 
 import { memo, useState } from "react";
 import {
-  Facebook,
-  Instagram,
   Mail,
   Phone,
   MapPin,
   ArrowRight,
   Heart,
+  ExternalLink,
 } from "lucide-react";
 import Link from "next/link";
 import { useCategories } from "@/src/hooks/useApi";
@@ -73,11 +72,11 @@ export const Footer = memo(function Footer() {
               your doorstep. Quality you can see, feel, and trust.
             </p>
             <div className="flex items-center gap-2 mb-5">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-zinc-800 hover:bg-[#0b2c5f] flex items-center justify-center transition-colors">
-                <Facebook className="w-4 h-4" />
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-zinc-800 hover:bg-[#0b2c5f] flex items-center justify-center transition-colors" aria-label="Facebook">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
               </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-zinc-800 hover:bg-[#e31c23] flex items-center justify-center transition-colors">
-                <Instagram className="w-4 h-4" />
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-zinc-800 hover:bg-[#e31c23] flex items-center justify-center transition-colors" aria-label="Instagram">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
               </a>
               <a href="mailto:atikrj8@gmail.com" className="w-9 h-9 rounded-lg bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition-colors">
                 <Mail className="w-4 h-4" />
