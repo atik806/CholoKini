@@ -63,7 +63,7 @@ STORE
             >
               {/* Secondary CTA Button: Brick Red, 2deg rotation */}
               <Link
-                href="/shop?sort=discount"
+                href="/shop"
                 className="inline-flex items-center gap-2 bg-[#BE3D1F] hover:bg-[#9E3017] text-white font-extrabold text-sm px-6 py-3.5 rounded-[3px] shadow-lg border border-red-950 transition-all hover:scale-[1.02] active:scale-95 rotate-2 hover:rotate-0"
               >
                 SHOP NOW
