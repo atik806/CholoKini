@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { Heart, ShoppingBag, Minus, Plus, Share2 } from "lucide-react";
+import { Heart, ShoppingBag, Minus, Plus, Share2, ShieldCheck, Truck, RefreshCw } from "lucide-react";
 import { ProductGallery } from "@/src/components/product/ProductGallery";
 import { ProductGrid } from "@/src/components/product/ProductGrid";
 import { ReviewSection } from "@/src/components/product/ReviewSection";
@@ -37,8 +37,12 @@ export default function ProductDetailPage() {
 
   if (!product) {
     return (
-      <div className="container py-20 text-center">
-        <h1 className="text-2xl font-bold">Product not found</h1>
+      <div className="container py-20 text-center bg-[#FBF6EC]">
+        <h1 className="font-serif text-2xl font-bold text-[#132A3A]">Product Not Found</h1>
+        <p className="font-mono text-xs text-[#1C1A17]/60 mt-2">The requested product could not be found.</p>
+        <Link href="/shop" className="mt-4 inline-block font-mono text-xs font-bold text-[#132A3A] bg-[#F5A300] px-4 py-2 rounded-[3px] border border-[#D88900]">
+          RETURN TO MARKET SHOP &rarr;
+        </Link>
       </div>
     );
   }
@@ -61,16 +65,16 @@ export default function ProductDetailPage() {
       navigator.share({ title: product.name, url: window.location.href });
     } else {
       navigator.clipboard.writeText(window.location.href);
-      addToast("Link copied to clipboard", "success");
+      addToast("Product link copied to clipboard", "success");
     }
   };
 
   const badge = product.isNew
-    ? { variant: "new" as const, label: "New Arrival" }
+    ? { variant: "new" as const, label: "NEW" }
     : product.originalPrice
-    ? { variant: "sale" as const, label: "Sale" }
+    ? { variant: "sale" as const, label: `-${Math.round((1 - product.price / product.originalPrice) * 100)}% OFF` }
     : product.stock === "out-of-stock"
-    ? { variant: "out-of-stock" as const, label: "Sold Out" }
+    ? { variant: "out-of-stock" as const, label: "SOLD OUT" }
     : undefined;
 
   return (
@@ -78,7 +82,7 @@ export default function ProductDetailPage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="container py-6 md:py-8"
+      className="container py-6 md:py-10 bg-[#FBF6EC]"
     >
       <Breadcrumbs
         items={[
@@ -88,16 +92,16 @@ export default function ProductDetailPage() {
         ]}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 mb-16">
+      <div className="bg-white rounded-[3px] border-2 border-[#E7DCC4] p-6 sm:p-8 shadow-sm grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-12">
         <ProductGallery images={product.images} name={product.name} />
 
         <div className="flex flex-col">
           <div className="flex items-start justify-between gap-4 mb-3">
             <div>
-              <p className="text-xs text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">
-                {product.category}
-              </p>
-              <h1 className="font-serif text-2xl md:text-3xl font-bold leading-tight">
+              <span className="font-mono text-xs font-bold text-[#132A3A]/70 uppercase tracking-widest block mb-1">
+                {product.category} • SKU #{product.id.slice(0, 6)}
+              </span>
+              <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-[#132A3A] leading-tight">
                 {product.name}
               </h1>
             </div>
@@ -106,38 +110,39 @@ export default function ProductDetailPage() {
 
           <Rating value={product.rating} count={product.reviewCount} size="md" />
 
-          <div className="flex items-baseline gap-3 mt-5">
-            <span className="text-2xl md:text-3xl font-bold">
+          <div className="flex items-baseline gap-3 mt-4 p-3 bg-[#FBF6EC] border border-[#E7DCC4] rounded-[2px]">
+            <span className="font-mono font-extrabold text-2xl sm:text-3xl text-[#1F6F50]">
               {formatPrice(product.price)}
             </span>
             {product.originalPrice && (
-              <span className="text-base text-zinc-400 dark:text-zinc-500 line-through">
+              <span className="font-mono text-sm text-[#1C1A17]/50 line-through">
                 {formatPrice(product.originalPrice)}
               </span>
             )}
             {product.originalPrice && (
-              <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
-                Save {formatPrice(product.originalPrice - product.price)}
+              <span className="font-mono text-xs font-bold text-[#BE3D1F] bg-[#BE3D1F]/10 px-2 py-0.5 rounded-[2px] border border-[#BE3D1F]/20">
+                SAVE {formatPrice(product.originalPrice - product.price)} / UNIT
               </span>
             )}
           </div>
 
-          <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed mt-5">
+          <p className="text-[#1C1A17]/80 text-xs sm:text-sm leading-relaxed mt-5 font-sans">
             {product.description}
           </p>
 
+          {/* Sizes Variant */}
           {product.variants?.sizes && (
-            <div className="mt-7">
-              <p className="text-sm font-medium mb-2.5">Size</p>
+            <div className="mt-6">
+              <p className="font-mono text-xs font-bold text-[#132A3A] uppercase tracking-wider mb-2">Available Sizes</p>
               <div className="flex flex-wrap gap-2">
                 {product.variants.sizes.map((size) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
+                    className={`px-3.5 py-1.5 rounded-[2px] font-mono text-xs font-bold border transition-all ${
                       selectedSize === size
-                        ? "border-primary bg-primary/5 dark:bg-primary/10 text-primary dark:text-primary-light ring-1 ring-primary/20"
-                        : "border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-500"
+                        ? "border-[#F5A300] bg-[#132A3A] text-[#F5A300]"
+                        : "border-[#E7DCC4] bg-white text-[#132A3A] hover:border-[#F5A300]"
                     }`}
                   >
                     {size}
@@ -147,18 +152,19 @@ export default function ProductDetailPage() {
             </div>
           )}
 
+          {/* Colors Variant */}
           {product.variants?.colors && (
             <div className="mt-5">
-              <p className="text-sm font-medium mb-2.5">Color</p>
+              <p className="font-mono text-xs font-bold text-[#132A3A] uppercase tracking-wider mb-2">Available Colors</p>
               <div className="flex gap-2">
                 {product.variants.colors.map((color) => (
                   <button
                     key={color.name}
                     onClick={() => setSelectedColor(color.name)}
-                    className={`w-9 h-9 rounded-full border-2 transition-all ${
+                    className={`w-8 h-8 rounded-full border-2 transition-all ${
                       selectedColor === color.name
-                        ? "border-primary ring-2 ring-primary/20 scale-110"
-                        : "border-transparent hover:scale-105"
+                        ? "border-[#F5A300] ring-2 ring-[#F5A300]/40 scale-110"
+                        : "border-[#E7DCC4] hover:scale-105"
                     }`}
                     style={{ backgroundColor: color.hex }}
                     title={color.name}
@@ -168,63 +174,74 @@ export default function ProductDetailPage() {
             </div>
           )}
 
+          {/* Quantity Selector */}
           <div className="mt-5">
-            <p className="text-sm font-medium mb-2.5">Quantity</p>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                disabled={isOutOfStock}
-                className="w-10 h-10 rounded-lg border border-zinc-200 dark:border-zinc-700 flex items-center justify-center hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Minus className="w-4 h-4" />
-              </button>
-              <span className="w-12 text-center font-medium">{isOutOfStock ? 0 : quantity}</span>
-              <button
-                onClick={() => setQuantity((q) => Math.min(q + 1, 10))}
-                disabled={isOutOfStock}
-                className="w-10 h-10 rounded-lg border border-zinc-200 dark:border-zinc-700 flex items-center justify-center hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+            <p className="font-mono text-xs font-bold text-[#132A3A] uppercase tracking-wider mb-2">Order Quantity (Units)</p>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center border-2 border-[#E7DCC4] rounded-[2px] bg-[#FBF6EC]">
+                <button
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  disabled={isOutOfStock}
+                  className="w-9 h-9 flex items-center justify-center text-[#132A3A] hover:bg-[#F5A300] transition-colors disabled:opacity-50"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <span className="w-12 text-center font-mono font-bold text-sm text-[#132A3A]">
+                  {isOutOfStock ? 0 : quantity}
+                </span>
+                <button
+                  onClick={() => setQuantity((q) => Math.min(q + 1, 100))}
+                  disabled={isOutOfStock}
+                  className="w-9 h-9 flex items-center justify-center text-[#132A3A] hover:bg-[#F5A300] transition-colors disabled:opacity-50"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+              <span className="font-mono text-xs text-[#1F6F50] font-bold">
+                Total: {formatPrice(product.price * (isOutOfStock ? 0 : quantity))}
+              </span>
             </div>
           </div>
 
+          {/* Action Buttons */}
           <div className="flex items-center gap-3 mt-7">
-            <Button size="lg" className="flex-1 min-h-[48px]" onClick={handleAdd} disabled={isOutOfStock}>
-              <ShoppingBag className="w-5 h-5" /> {isOutOfStock ? "Sold Out" : "Add to Cart"}
+            <Button size="lg" className="flex-1 min-h-[48px]" onClick={handleAdd} disabled={isOutOfStock} rotate>
+              <ShoppingBag className="w-4 h-4" /> {isOutOfStock ? "SOLD OUT" : "ADD TO MARKET CART"}
             </Button>
             <button
               onClick={() => toggleWishlist(product.id)}
-              className="w-12 h-12 shrink-0 rounded-lg border border-zinc-200 dark:border-zinc-700 flex items-center justify-center hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+              className="w-12 h-12 shrink-0 rounded-[2px] border-2 border-[#E7DCC4] bg-white flex items-center justify-center hover:border-[#F5A300] hover:bg-[#FBF6EC] transition-colors"
+              aria-label="Add to wishlist"
             >
               <Heart
                 className={`w-5 h-5 ${
-                  wishlisted ? "fill-red-500 dark:fill-red-400 text-red-500 dark:text-red-400" : ""
+                  wishlisted ? "fill-[#BE3D1F] text-[#BE3D1F]" : "text-[#132A3A]"
                 }`}
               />
             </button>
             <button
               onClick={handleShare}
-              className="w-12 h-12 shrink-0 rounded-lg border border-zinc-200 dark:border-zinc-700 flex items-center justify-center hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+              className="w-12 h-12 shrink-0 rounded-[2px] border-2 border-[#E7DCC4] bg-white flex items-center justify-center hover:border-[#F5A300] hover:bg-[#FBF6EC] transition-colors"
+              aria-label="Share item"
             >
-              <Share2 className="w-5 h-5" />
+              <Share2 className="w-5 h-5 text-[#132A3A]" />
             </button>
           </div>
 
-
-
-          <div className="mt-4 text-xs text-zinc-400 dark:text-zinc-500">
-            Tags:{" "}
-            {product.tags.map((t) => (
-              <Link
-                key={t}
-                href={`/shop?categories=${encodeURIComponent(t)}`}
-                className="hover:text-primary dark:hover:text-primary-light transition-colors"
-              >
-                #{t}
-              </Link>
-            ))}
-            {product.tags.length > 1 && ", "}
+          {/* Market Trust Badges */}
+          <div className="mt-6 pt-5 border-t border-[#E7DCC4] grid grid-cols-3 gap-2 font-mono text-[10px] text-[#132A3A]">
+            <div className="flex items-center gap-1.5 bg-[#FBF6EC] p-2 rounded-[2px] border border-[#E7DCC4]">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#F5A300]" />
+              <span>COD GUARANTEE</span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-[#FBF6EC] p-2 rounded-[2px] border border-[#E7DCC4]">
+              <Truck className="w-3.5 h-3.5 text-[#1F6F50]" />
+              <span>24-48H SHIPPING</span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-[#FBF6EC] p-2 rounded-[2px] border border-[#E7DCC4]">
+              <RefreshCw className="w-3.5 h-3.5 text-[#BE3D1F]" />
+              <span>7-DAY EXCHANGES</span>
+            </div>
           </div>
         </div>
       </div>
@@ -232,35 +249,12 @@ export default function ProductDetailPage() {
       <ReviewSection productId={product.id} />
 
       {(related || []).length > 0 && (
-        <section>
-          <h2 className="font-serif text-2xl font-bold mb-8">
-            You May Also Like
+        <section className="mt-12">
+          <h2 className="font-serif text-2xl font-bold text-[#132A3A] mb-6">
+            Related Market Stock
           </h2>
           <ProductGrid products={related || []} />
         </section>
-      )}
-
-      {/* Mobile Bottom Bar */}
-      {!isOutOfStock && (
-        <motion.div
-          initial={{ y: 100 }}
-          animate={{ y: 0 }}
-          className="fixed bottom-14 left-0 right-0 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 p-3 flex items-center gap-3 z-40 shadow-2xl md:hidden"
-        >
-          <div className="flex-1">
-            <div className="flex items-baseline gap-2">
-              <span className="text-lg font-bold">{formatPrice(product.price)}</span>
-              {product.originalPrice && (
-                <span className="text-xs text-zinc-400 dark:text-zinc-500 line-through">
-                  {formatPrice(product.originalPrice)}
-                </span>
-              )}
-            </div>
-          </div>
-          <Button size="lg" className="flex-1 min-h-[44px]" onClick={handleAdd}>
-            <ShoppingBag className="w-4 h-4" /> Add to Cart
-          </Button>
-        </motion.div>
       )}
     </motion.div>
   );

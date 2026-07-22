@@ -4,7 +4,7 @@ import { Suspense, useState } from "react";
 import { motion } from "framer-motion";
 import { useSearchParams, useRouter } from "next/navigation";
 import useSWR from "swr";
-import { Search, X } from "lucide-react";
+import { Search, X, BookOpen } from "lucide-react";
 import { ProductGrid } from "@/src/components/product/ProductGrid";
 import { Breadcrumbs } from "@/src/components/ui/Breadcrumbs";
 import { EmptyState } from "@/src/components/ui/EmptyState";
@@ -15,7 +15,7 @@ export default function SearchPageWrapper() {
   return (
     <Suspense
       fallback={
-        <div className="container py-20 text-center text-zinc-500 dark:text-zinc-400">Loading...</div>
+        <div className="container py-20 text-center font-mono text-xs text-[#132A3A]">LOADING SEARCH...</div>
       }
     >
       <SearchPage />
@@ -42,53 +42,67 @@ function SearchPage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="container py-8"
+      className="bg-[#FBF6EC]"
     >
-      <Breadcrumbs items={[{ label: "Search" }]} />
-
-      <div className="max-w-xl mb-10">
-        <h1 className="font-serif text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Search</h1>
-        <SearchQueryInput
-          key={query}
-          initialQuery={query}
-          onSubmit={(value) => {
-            const trimmed = value.trim();
-            router.push(trimmed ? `/search?q=${encodeURIComponent(trimmed)}` : "/search");
-          }}
-        />
+      {/* Page Header */}
+      <div className="bg-[#132A3A] text-white border-b-2 border-[#E7DCC4] py-10 md:py-14">
+        <div className="container">
+          <Breadcrumbs items={[{ label: "Search" }]} />
+          <div className="max-w-2xl mt-4">
+            <div className="inline-flex items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider text-[#F5A300] bg-[#0D1F2C] px-3 py-1 border border-[#F5A300]/40 rounded-[2px] mb-3">
+              <BookOpen className="w-3.5 h-3.5" /> SEARCH
+            </div>
+            <h1 className="font-serif text-3xl md:text-5xl font-extrabold">
+              Search Products
+            </h1>
+          </div>
+        </div>
       </div>
 
-      {query && (
-        <div className="mb-6">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            {loading ? "Searching..." : displayResults.length === 0
-              ? `No results found for "${query}"`
-              : `Showing ${displayResults.length} result${displayResults.length > 1 ? "s" : ""} for "${query}"`}
-          </p>
+      <div className="container py-8">
+        <div className="max-w-xl mb-10">
+          <SearchQueryInput
+            key={query}
+            initialQuery={query}
+            onSubmit={(value) => {
+              const trimmed = value.trim();
+              router.push(trimmed ? `/search?q=${encodeURIComponent(trimmed)}` : "/search");
+            }}
+          />
         </div>
-      )}
 
-      {loading && query ? (
-        <ShopSkeleton />
-      ) : !loading && displayResults.length > 0 ? (
-        <ProductGrid products={displayResults} />
-      ) : !loading && query ? (
-        <EmptyState
-          icon={<Search className="w-10 h-10 text-primary dark:text-primary-light" />}
-          title="No results found"
-          description="Try adjusting your search terms or browse our categories."
-          actionLabel="Browse Categories"
-          actionHref="/shop"
-        />
-      ) : !query ? (
-        <EmptyState
-          icon={<Search className="w-10 h-10 text-primary dark:text-primary-light" />}
-          title="Search our store"
-          description="Type above to find products across all categories."
-          actionLabel="Shop All"
-          actionHref="/shop"
-        />
-      ) : null}
+        {query && (
+          <div className="mb-6">
+            <p className="font-mono text-xs text-[#1C1A17]/70">
+              {loading ? "SEARCHING..." : displayResults.length === 0
+                ? `No results found for "${query}"`
+                : `Showing ${displayResults.length} result${displayResults.length > 1 ? "s" : ""} for "${query}"`}
+            </p>
+          </div>
+        )}
+
+        {loading && query ? (
+          <ShopSkeleton />
+        ) : !loading && displayResults.length > 0 ? (
+          <ProductGrid products={displayResults} />
+        ) : !loading && query ? (
+          <EmptyState
+            icon={<Search className="w-10 h-10 text-[#132A3A]/40" />}
+            title="No results found"
+            description="Try adjusting your search terms or browse our categories."
+            actionLabel="Browse Categories"
+            actionHref="/shop"
+          />
+        ) : !query ? (
+          <EmptyState
+            icon={<Search className="w-10 h-10 text-[#132A3A]/40" />}
+            title="Search our store"
+            description="Type above to find products across all categories."
+            actionLabel="Shop All"
+            actionHref="/shop"
+          />
+        ) : null}
+      </div>
     </motion.div>
   );
 }
@@ -103,8 +117,8 @@ function SearchQueryInput({
   const [localQuery, setLocalQuery] = useState(initialQuery);
 
   return (
-    <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 px-4">
-      <Search className="w-5 h-5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+    <div className="flex items-center gap-2 bg-white rounded-[3px] border-2 border-[#E7DCC4] px-4 focus-within:border-[#F5A300] transition-colors">
+      <Search className="w-5 h-5 text-[#F5A300] shrink-0" />
       <input
         type="text"
         value={localQuery}
@@ -113,16 +127,16 @@ function SearchQueryInput({
           if (e.key === "Enter") onSubmit(localQuery);
         }}
         placeholder="Search products..."
-        className="flex-1 bg-transparent py-3 text-sm outline-none text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
+        className="flex-1 bg-transparent py-3 text-sm outline-none text-[#132A3A] placeholder:text-[#1C1A17]/40 font-mono"
         autoFocus
       />
       {localQuery && (
         <button
           type="button"
           onClick={() => setLocalQuery("")}
-          className="p-1 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+          className="p-1 rounded-[2px] hover:bg-[#FBF6EC] transition-colors text-[#132A3A]"
         >
-          <X className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
+          <X className="w-4 h-4" />
         </button>
       )}
     </div>

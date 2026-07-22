@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
+import { SlidersHorizontal, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import useSWR from "swr";
 import { sortOptions } from "@/src/lib/constants";
@@ -17,7 +17,7 @@ const ITEMS_PER_PAGE = 12;
 
 export default function ShopPageWrapper() {
   return (
-    <Suspense fallback={<div className="container py-20 text-center text-zinc-500 dark:text-zinc-400">Loading...</div>}>
+    <Suspense fallback={<div className="container py-20 text-center font-mono text-xs text-[#132A3A]">LOADING MARKET LEDGER...</div>}>
       <ShopPage />
     </Suspense>
   );
@@ -141,40 +141,46 @@ function ShopPage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      className="bg-[#FBF6EC] min-h-screen"
     >
       {/* Page Header */}
-      <div className="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-100 dark:border-zinc-800">
-        <div className="container py-10 md:py-14">
+      <div className="bg-[#132A3A] text-white border-b-2 border-[#E7DCC4] py-10 md:py-14">
+        <div className="container">
           <Breadcrumbs items={[{ label: "Shop" }]} />
-          <h1 className="font-serif text-3xl md:text-4xl font-bold mt-3">
+          <div className="inline-flex items-center gap-2 font-mono text-xs text-[#F5A300] bg-[#0D1F2C] px-3 py-1 border border-[#F5A300]/40 rounded-[2px] mb-3 uppercase">
+            <BookOpen className="w-3.5 h-3.5" /> OUR PRODUCTS
+          </div>
+          <h1 className="font-serif text-3xl md:text-5xl font-extrabold tracking-tight">
             {selectedCategoryNames.length === 1
               ? selectedCategoryNames[0]
               : "All Products"}
           </h1>
-          <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">
-            {isLoading ? "Loading..." : `${total} products found`}
+          <p className="font-mono text-xs text-[#E7DCC4]/80 mt-2">
+            {isLoading ? "LOADING..." : `Showing ${total} Products`}
           </p>
         </div>
       </div>
 
       <div className="container py-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-          <div />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 bg-white p-4 rounded-[3px] border border-[#E7DCC4]">
+          <div className="font-mono text-xs font-bold text-[#132A3A] uppercase">
+            SHOWING PAGE {safePage} OF {totalPages || 1}
+          </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
               onClick={() => setMobileFilterOpen(true)}
-              className="flex items-center justify-center gap-2 lg:hidden px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors flex-1 sm:flex-initial"
+              className="flex items-center justify-center gap-2 lg:hidden px-4 py-2 rounded-[3px] border border-[#E7DCC4] bg-[#FBF6EC] font-mono text-xs font-bold text-[#132A3A] hover:bg-[#F5A300] transition-colors flex-1 sm:flex-initial"
             >
-              <SlidersHorizontal className="w-4 h-4" /> Filters
+              <SlidersHorizontal className="w-4 h-4 text-[#BE3D1F]" /> FILTER
             </button>
             <select
               value={sort}
               onChange={(e) => updateParams({ sort: e.target.value !== "popular" ? e.target.value : null, page: null })}
-              className="text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2.5 bg-white dark:bg-zinc-800 outline-none focus:ring-2 focus:ring-primary/20 flex-1 sm:flex-initial"
+              className="font-mono text-xs font-bold border-2 border-[#E7DCC4] rounded-[3px] px-3 py-2 bg-white text-[#132A3A] outline-none focus:border-[#F5A300] flex-1 sm:flex-initial"
             >
               {sortOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>
-                  {opt.label}
+                  SORT: {opt.label.toUpperCase()}
                 </option>
               ))}
             </select>
@@ -198,11 +204,11 @@ function ShopPage() {
                 </AnimatePresence>
 
                 {totalPages > 1 && (
-                  <div className="flex items-center justify-center gap-1.5 sm:gap-2 mt-12 flex-wrap">
+                  <div className="flex items-center justify-center gap-2 mt-12 flex-wrap font-mono text-xs">
                     <button
                       onClick={() => updateParams({ page: String(safePage - 1) })}
                       disabled={safePage <= 1}
-                      className="p-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="p-2.5 rounded-[3px] border border-[#E7DCC4] bg-white text-[#132A3A] hover:bg-[#F5A300] transition-colors disabled:opacity-30 disabled:cursor-not-allowed font-bold"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -210,10 +216,10 @@ function ShopPage() {
                       <button
                         key={i}
                         onClick={() => updateParams({ page: String(i + 1) })}
-                        className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                        className={`w-10 h-10 rounded-[3px] font-mono font-extrabold transition-colors border ${
                           safePage === i + 1
-                            ? "bg-primary text-white"
-                            : "border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                            ? "bg-[#132A3A] text-[#F5A300] border-[#132A3A]"
+                            : "bg-white text-[#132A3A] border-[#E7DCC4] hover:bg-[#F5A300]/20"
                         }`}
                       >
                         {i + 1}
@@ -222,7 +228,7 @@ function ShopPage() {
                     <button
                       onClick={() => updateParams({ page: String(safePage + 1) })}
                       disabled={safePage >= totalPages}
-                      className="p-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="p-2.5 rounded-[3px] border border-[#E7DCC4] bg-white text-[#132A3A] hover:bg-[#F5A300] transition-colors disabled:opacity-30 disabled:cursor-not-allowed font-bold"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -241,14 +247,14 @@ function ShopPage() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setMobileFilterOpen(false)}
-                className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] lg:hidden"
+                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] lg:hidden"
               />
               <motion.div
                 initial={{ x: "-100%" }}
                 animate={{ x: 0 }}
                 exit={{ x: "-100%" }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="fixed top-0 left-0 right-0 bottom-0 w-full max-w-sm bg-white dark:bg-zinc-900 z-[70] shadow-2xl p-6 overflow-y-auto lg:hidden"
+                className="fixed top-0 left-0 right-0 bottom-0 w-full max-w-sm bg-[#FBF6EC] z-[70] shadow-2xl p-6 overflow-y-auto lg:hidden border-r-2 border-[#E7DCC4]"
               >
                 <ProductFilters
                   filters={filters}
