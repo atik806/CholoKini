@@ -49,7 +49,7 @@ export const Footer = memo(function Footer() {
             {/* Social Icons */}
             <div className="flex items-center gap-2 pt-2">
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/profile.php?id=61588527085764"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-[2px] bg-[#0D1F2C] dark:bg-[#071520] border border-[#E7DCC4]/30 dark:border-[#2a3d4d] hover:bg-[#F5A300] hover:text-[#132A3A] hover:border-[#D88900] flex items-center justify-center transition-colors text-white"
