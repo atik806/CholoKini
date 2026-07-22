@@ -3,6 +3,7 @@
 import type { DeliveryZone } from "@/src/lib/constants";
 import { DELIVERY_CHARGES } from "@/src/lib/constants";
 import { Input } from "@/src/components/ui/Input";
+import { Truck } from "lucide-react";
 
 export interface ShippingFormValues {
   firstName: string;
@@ -34,27 +35,30 @@ export function ShippingForm({
 
   return (
     <div className="space-y-4">
-      <h2 className="font-serif text-2xl font-bold">Shipping Address</h2>
+      <h2 className="font-serif text-xl font-extrabold text-[#132A3A]">Shipping Address</h2>
 
       <div className="space-y-2">
-        <label className="block text-sm font-medium">Delivery Area</label>
+        <label className="block font-mono text-xs font-bold text-[#132A3A] uppercase tracking-wider">Delivery Area</label>
         <div className="grid grid-cols-2 gap-3">
           {(['inside_dhaka', 'outside_dhaka'] as const).map((zone) => (
             <button
               key={zone}
               type="button"
               onClick={() => onDeliveryZoneChange(zone)}
-              className={`rounded-xl border-2 p-4 text-left transition-all ${
+              className={`rounded-[3px] border-2 p-4 text-left transition-all ${
                 deliveryZone === zone
-                  ? "border-primary bg-primary/5 dark:bg-primary/10"
-                  : "border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600"
+                  ? "border-[#F5A300] bg-[#F5A300]/10"
+                  : "border-[#E7DCC4] hover:border-[#132A3A]"
               }`}
             >
-              <p className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
-                {zone === 'inside_dhaka' ? 'Inside Dhaka' : 'Outside Dhaka'}
-              </p>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                Delivery Charge: ৳{DELIVERY_CHARGES[zone]}
+              <div className="flex items-center gap-2 mb-1">
+                <Truck className={`w-4 h-4 ${deliveryZone === zone ? "text-[#F5A300]" : "text-[#132A3A]/40"}`} />
+                <p className="font-serif font-bold text-sm text-[#132A3A]">
+                  {zone === 'inside_dhaka' ? 'Inside Dhaka' : 'Outside Dhaka'}
+                </p>
+              </div>
+              <p className="font-mono text-xs text-[#1F6F50] font-bold">
+                Delivery: ৳{DELIVERY_CHARGES[zone]}
               </p>
             </button>
           ))}
