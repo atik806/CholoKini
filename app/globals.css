@@ -115,3 +115,16 @@
   outline-offset: 2px;
 }
 
+@keyframes ken-burns {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.08);
+  }
+}
+
+.ken-burns {
+  animation: ken-burns 10s ease-in-out infinite alternate;
+}
+

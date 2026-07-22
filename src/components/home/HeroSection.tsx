@@ -1,15 +1,51 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Truck, ShieldCheck, RefreshCw } from "lucide-react";
 import Link from "next/link";
 
+const SLIDE_IMAGES = [
+  "/hero-slides/slide-01.png",
+  "/hero-slides/slide-02.png",
+  "/hero-slides/slide-03.png",
+  "/hero-slides/slide-04.png",
+];
+
 export function HeroSection() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % SLIDE_IMAGES.length);
+    }, 7000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="relative overflow-hidden bg-[#132A3A] border-b-2 border-[#E7DCC4] py-12 md:py-20 lg:py-24 text-white">
-      {/* Background ledger grid lines pattern */}
+      {/* Layer 1: Background images slideshow */}
+      <div className="absolute inset-0 pointer-events-none">
+        {SLIDE_IMAGES.map((src, i) => (
+          <div
+            key={src}
+            className="absolute inset-0 bg-cover bg-center ken-burns"
+            style={{
+              backgroundImage: `url(${src})`,
+              opacity: i === currentIndex ? 1 : 0,
+              transition: "opacity 1.2s ease-in-out",
+              zIndex: i === currentIndex ? 1 : 0,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Layer 2: Dark navy overlay */}
+      <div className="absolute inset-0 bg-[#0A1A28]/85 pointer-events-none" />
+
+      {/* Layer 3: Blueprint grid lines pattern */}
       <div
-        className="absolute inset-0 opacity-10 pointer-events-none"
+        className="absolute inset-0 opacity-20 pointer-events-none"
         style={{
           backgroundImage:
             "linear-gradient(to right, #E7DCC4 1px, transparent 1px), linear-gradient(to bottom, #E7DCC4 1px, transparent 1px)",
@@ -28,7 +64,7 @@ export function HeroSection() {
               className="inline-flex items-center gap-2 bg-[#0D1F2C] border border-[#F5A300] text-[#F5A300] font-mono text-xs px-3.5 py-1.5 font-bold -rotate-1 rounded-[3px] shadow-sm uppercase tracking-wider mb-6"
             >
               <span className="w-2 h-2 rounded-full bg-[#F5A300] animate-pulse" />
-              SHOP DHAKADROP #2026
+              SHOP DHAKA WHOLESALE #2026
             </motion.div>
 
             <motion.h1
@@ -50,7 +86,7 @@ STORE
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-base sm:text-lg text-[#E7DCC4] max-w-xl mb-8 leading-relaxed font-sans"
+              className="text-base sm:text-lg text-white max-w-xl mb-8 leading-relaxed font-sans"
             >
               Bangladesh&apos;s trusted online store. Shop quality products with cash on delivery nationwide and fast shipping.
             </motion.p>
@@ -74,15 +110,15 @@ STORE
             <div className="mt-10 pt-6 border-t border-[#E7DCC4]/20 grid grid-cols-3 gap-4 font-mono text-xs">
               <div>
                 <span className="block text-[#F5A300] font-bold text-lg">5,000+</span>
-                <span className="text-[#E7DCC4]/80 text-[11px]">ACTIVE CUSTOMERS</span>
+                <span className="text-white/80 text-[11px]">ACTIVE CUSTOMERS</span>
               </div>
               <div>
                 <span className="block text-[#F5A300] font-bold text-lg">100%</span>
-                <span className="text-[#E7DCC4]/80 text-[11px]">COD VERIFIED</span>
+                <span className="text-white/80 text-[11px]">COD VERIFIED</span>
               </div>
               <div>
                 <span className="block text-[#F5A300] font-bold text-lg">24-48H</span>
-                <span className="text-[#E7DCC4]/80 text-[11px]">EXPRESS DELIVERY</span>
+                <span className="text-white/80 text-[11px]">EXPRESS DELIVERY</span>
               </div>
             </div>
           </div>

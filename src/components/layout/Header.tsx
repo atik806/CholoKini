@@ -187,11 +187,6 @@ export const Header = memo(function Header() {
             </span>
             <span className="text-[#E7DCC4]/30">|</span>
             <span className="flex items-center gap-1.5">
-              <Truck className="w-3.5 h-3.5 text-[#F5A300]" />
-              FREE DELIVERY ON ORDERS &gt; ৳1,000
-            </span>
-            <span className="text-[#E7DCC4]/30">|</span>
-            <span className="flex items-center gap-1.5">
               <Phone className="w-3.5 h-3.5 text-[#F5A300]" />
               01302228993
             </span>
