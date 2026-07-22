@@ -29,11 +29,11 @@ export function ProductGrid({ products, loading }: ProductGridProps) {
         animate={{ opacity: 1 }}
         className="flex flex-col items-center justify-center py-20 text-center"
       >
-        <Package className="w-16 h-16 text-zinc-300 dark:text-zinc-600 mb-4" />
-        <h3 className="text-lg font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
+        <Package className="w-16 h-16 text-[#E7DCC4] mb-4" />
+        <h3 className="font-serif text-lg font-bold text-[#132A3A] mb-1">
           No products found
         </h3>
-        <p className="text-sm text-zinc-400 dark:text-zinc-500">
+        <p className="font-mono text-xs text-[#1C1A17]/60">
           Try adjusting your search or filter criteria.
         </p>
       </motion.div>

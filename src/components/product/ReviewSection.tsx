@@ -47,13 +47,13 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
   };
 
   return (
-    <section className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700">
+    <section className="mt-12 pt-8 border-t border-[#E7DCC4]">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="font-serif text-2xl font-bold">Reviews</h2>
+        <h2 className="font-serif text-2xl font-extrabold text-[#132A3A]">Market Reviews</h2>
         {user && !formOpen && (
           <button
             onClick={() => setFormOpen(true)}
-            className="text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+            className="font-mono text-xs font-bold text-[#F5A300] hover:text-[#D88900] transition-colors uppercase tracking-wider"
           >
             Write a Review
           </button>
@@ -61,7 +61,7 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
         {!user && (
           <a
             href="/login"
-            className="text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+            className="font-mono text-xs font-bold text-[#F5A300] hover:text-[#D88900] transition-colors uppercase tracking-wider"
           >
             Sign in to review
           </a>
@@ -69,8 +69,8 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
       </div>
 
       {formOpen && (
-        <form onSubmit={handleSubmit} className="mb-8 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-5 border border-zinc-200 dark:border-zinc-700 space-y-4">
-          <p className="text-sm font-medium">Your Rating</p>
+        <form onSubmit={handleSubmit} className="mb-8 bg-[#FBF6EC] rounded-[3px] p-5 border-2 border-[#E7DCC4] space-y-4">
+          <p className="font-mono text-xs font-bold text-[#132A3A] uppercase tracking-wider">Your Rating</p>
           <div className="flex gap-1">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
@@ -84,8 +84,8 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
                 <Star
                   className={`w-6 h-6 transition-colors ${
                     star <= (hoveredStar || rating)
-                      ? "fill-amber-400 text-amber-400"
-                      : "fill-zinc-200 dark:fill-zinc-600 text-zinc-200 dark:text-zinc-600"
+                      ? "fill-[#F5A300] text-[#F5A300]"
+                      : "fill-[#E7DCC4] text-[#E7DCC4]"
                   }`}
                 />
               </button>
@@ -99,13 +99,13 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
             maxLength={1000}
             required
             placeholder="Share your experience with this product (min 10 characters)..."
-            className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+            className="w-full px-4 py-3 rounded-[3px] border-2 border-[#E7DCC4] bg-white font-mono text-xs text-[#132A3A] focus:outline-none focus:border-[#F5A300] focus:ring-2 focus:ring-[#F5A300]/20 resize-none placeholder:text-[#1C1A17]/40"
           />
           <div className="flex items-center gap-3">
             <button
               type="submit"
               disabled={submitting || text.length < 10}
-              className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-2 bg-[#F5A300] hover:bg-[#D88900] text-[#132A3A] px-5 py-2.5 rounded-[3px] font-mono text-xs font-extrabold uppercase tracking-wider border border-[#D88900] transition-colors disabled:opacity-50"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
               {submitting ? "Submitting..." : "Submit Review"}
@@ -113,7 +113,7 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
             <button
               type="button"
               onClick={() => { setFormOpen(false); setText(""); setRating(5); }}
-              className="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+              className="font-mono text-xs text-[#1C1A17]/60 hover:text-[#132A3A] transition-colors"
             >
               Cancel
             </button>
@@ -123,12 +123,12 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
 
       {isLoading ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="w-6 h-6 animate-spin text-zinc-400" />
+          <Loader2 className="w-6 h-6 animate-spin text-[#F5A300]" />
         </div>
       ) : reviews.length === 0 ? (
         <div className="text-center py-12">
-          <MessageSquare className="w-10 h-10 text-zinc-300 dark:text-zinc-600 mx-auto mb-3" />
-          <p className="text-zinc-500 dark:text-zinc-400 text-sm">
+          <MessageSquare className="w-10 h-10 text-[#E7DCC4] mx-auto mb-3" />
+          <p className="text-[#1C1A17]/60 text-sm font-sans">
             No reviews yet. Be the first to share your experience!
           </p>
         </div>
@@ -139,21 +139,21 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
           ))}
 
           {meta && meta.totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 pt-4 flex-wrap">
+            <div className="flex items-center justify-center gap-2 pt-4 flex-wrap font-mono text-xs">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium border border-zinc-200 dark:border-zinc-700 disabled:opacity-40 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                className="px-3 py-1.5 rounded-[2px] font-bold border border-[#E7DCC4] bg-white text-[#132A3A] disabled:opacity-40 hover:bg-[#F5A300] transition-colors"
               >
                 Previous
               </button>
-              <span className="text-sm text-zinc-500">
+              <span className="text-[#132A3A] font-bold">
                 Page {meta.page} of {meta.totalPages}
               </span>
               <button
                 onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
                 disabled={page >= meta.totalPages}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium border border-zinc-200 dark:border-zinc-700 disabled:opacity-40 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                className="px-3 py-1.5 rounded-[2px] font-bold border border-[#E7DCC4] bg-white text-[#132A3A] disabled:opacity-40 hover:bg-[#F5A300] transition-colors"
               >
                 Next
               </button>
@@ -170,17 +170,15 @@ function ReviewCard({ review }: { review: Review }) {
   const initial = name.charAt(0).toUpperCase();
 
   return (
-    <div className="bg-white dark:bg-zinc-800/50 rounded-2xl border border-zinc-200 dark:border-zinc-700 p-5">
+    <div className="bg-white rounded-[3px] border-2 border-[#E7DCC4] p-5">
       <div className="flex items-start gap-3">
-        <div className="w-9 h-9 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center shrink-0">
-          <span className="text-sm font-bold text-primary dark:text-primary-light">
-            {initial}
-          </span>
+        <div className="w-9 h-9 rounded-[2px] bg-[#132A3A] text-[#F5A300] font-mono font-bold flex items-center justify-center text-sm border border-[#E7DCC4] shrink-0">
+          {initial}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2 mb-1">
-            <p className="text-sm font-medium truncate">{name}</p>
-            <time className="text-xs text-zinc-400 dark:text-zinc-500 shrink-0">
+            <p className="font-serif font-bold text-sm text-[#132A3A] truncate">{name}</p>
+            <time className="font-mono text-[11px] text-[#1C1A17]/50 shrink-0">
               {formatDate(review.created_at)}
             </time>
           </div>
@@ -190,13 +188,13 @@ function ReviewCard({ review }: { review: Review }) {
                 key={star}
                 className={`w-3.5 h-3.5 ${
                   star <= review.rating
-                    ? "fill-amber-400 text-amber-400"
-                    : "fill-zinc-200 dark:fill-zinc-600 text-zinc-200 dark:text-zinc-600"
+                    ? "fill-[#F5A300] text-[#F5A300]"
+                    : "fill-[#E7DCC4] text-[#E7DCC4]"
                 }`}
               />
             ))}
           </div>
-          <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
+          <p className="text-sm text-[#1C1A17]/80 leading-relaxed font-sans">
             {review.text}
           </p>
         </div>

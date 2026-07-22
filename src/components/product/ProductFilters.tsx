@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, SlidersHorizontal, X, Star } from "lucide-react";
+import { ChevronDown, SlidersHorizontal, X, Star, Filter } from "lucide-react";
 import { useCategories } from "@/src/hooks/useApi";
 import { priceRanges } from "@/src/lib/constants";
 
@@ -31,19 +31,19 @@ function CustomCheckbox({
       role="checkbox"
       aria-checked={checked}
       onClick={onChange}
-      className={`flex-shrink-0 w-4 h-4 rounded border transition-colors duration-150 flex items-center justify-center ${
+      className={`flex-shrink-0 w-4 h-4 rounded-[2px] border transition-colors duration-150 flex items-center justify-center ${
         checked
-          ? "bg-primary dark:bg-primary-light border-primary dark:border-primary-light"
-          : "bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-600"
+          ? "bg-[#F5A300] border-[#D88900] text-[#132A3A]"
+          : "bg-white border-[#E7DCC4]"
       }`}
     >
       {checked && (
         <svg
-          className="w-3 h-3 text-white"
+          className="w-3 h-3 text-[#132A3A]"
           viewBox="0 0 12 12"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         >
@@ -69,12 +69,12 @@ function CustomRadio({
       onClick={onChange}
       className={`flex-shrink-0 w-4 h-4 rounded-full border transition-colors duration-150 flex items-center justify-center ${
         checked
-          ? "border-primary dark:border-primary-light"
-          : "bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-600"
+          ? "border-[#F5A300] bg-[#132A3A]"
+          : "bg-white border-[#E7DCC4]"
       }`}
     >
       {checked && (
-        <div className="w-2 h-2 rounded-full bg-primary dark:bg-primary-light" />
+        <div className="w-2 h-2 rounded-full bg-[#F5A300]" />
       )}
     </button>
   );
@@ -117,25 +117,27 @@ export function ProductFilters({ filters, onChange, onClose }: ProductFiltersPro
     filters.rating !== null;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="bg-white rounded-[3px] border-2 border-[#E7DCC4] p-5 shadow-sm space-y-6">
+      <div className="flex items-center justify-between pb-3 border-b border-[#E7DCC4]">
         <div className="flex items-center gap-2">
-          <SlidersHorizontal className="w-4 h-4" />
-          <span className="font-semibold text-sm">Filters</span>
+          <Filter className="w-4 h-4 text-[#F5A300]" />
+          <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#132A3A]">
+            Market Filters
+          </span>
         </div>
         <div className="flex items-center gap-2">
           {hasActiveFilters && (
             <button
               onClick={clearAll}
-              className="text-xs px-3 py-1 rounded-full border border-zinc-300 dark:border-zinc-600 text-zinc-500 dark:text-zinc-400 hover:text-primary dark:hover:text-primary-light hover:border-primary dark:hover:border-primary-light transition-colors"
+              className="font-mono text-[10px] font-bold px-2.5 py-1 rounded-[2px] border border-[#BE3D1F] text-[#BE3D1F] hover:bg-[#BE3D1F] hover:text-white transition-colors uppercase"
             >
-              Clear all
+              Clear All
             </button>
           )}
           {onClose && (
             <button
               onClick={onClose}
-              className="p-1 rounded-lg hover:bg-zinc-100 transition-colors md:hidden"
+              className="p-1 rounded-[2px] hover:bg-[#FBF6EC] transition-colors md:hidden text-[#132A3A]"
             >
               <X className="w-4 h-4" />
             </button>
@@ -144,21 +146,21 @@ export function ProductFilters({ filters, onChange, onClose }: ProductFiltersPro
       </div>
 
       <FilterSection
-        title="Category"
+        title="Department"
         expanded={expandedSections.category}
         onToggle={() => toggleSection("category")}
       >
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           {categories.map((cat) => (
             <label
               key={cat.id}
-              className="flex items-center gap-2.5 cursor-pointer group"
+              className="flex items-center gap-2.5 cursor-pointer group py-0.5"
             >
               <CustomCheckbox
                 checked={filters.categories.includes(cat.slug)}
                 onChange={() => toggleCategory(cat.slug)}
               />
-              <span className="text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">
+              <span className="text-xs font-sans font-medium text-[#1C1A17] group-hover:text-[#F5A300] transition-colors">
                 {cat.name}
               </span>
             </label>
@@ -167,21 +169,21 @@ export function ProductFilters({ filters, onChange, onClose }: ProductFiltersPro
       </FilterSection>
 
       <FilterSection
-        title="Price Range"
+        title="Unit Price Tier (BDT)"
         expanded={expandedSections.price}
         onToggle={() => toggleSection("price")}
       >
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           {priceRanges.map((range) => (
             <label
               key={range.value}
-              className="flex items-center gap-2.5 cursor-pointer group"
+              className="flex items-center gap-2.5 cursor-pointer group py-0.5"
             >
               <CustomRadio
                 checked={filters.priceRange === range.value}
                 onChange={() => setPrice(range.value)}
               />
-              <span className="text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">
+              <span className="font-mono text-xs text-[#1C1A17] group-hover:text-[#F5A300] transition-colors">
                 {range.label}
               </span>
             </label>
@@ -190,37 +192,37 @@ export function ProductFilters({ filters, onChange, onClose }: ProductFiltersPro
       </FilterSection>
 
       <FilterSection
-        title="Minimum Rating"
+        title="Verified Merchant Rating"
         expanded={expandedSections.rating}
         onToggle={() => toggleSection("rating")}
       >
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           {[4, 3, 2, 1].map((star) => (
             <label
               key={star}
-              className="flex items-center gap-2.5 cursor-pointer group"
+              className="flex items-center gap-2.5 cursor-pointer group py-0.5"
             >
               <CustomRadio
                 checked={filters.rating === star}
                 onChange={() => setRating(star)}
               />
-              <span className="flex items-center gap-1 text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">
+              <span className="flex items-center gap-1 font-mono text-xs text-[#1C1A17] group-hover:text-[#F5A300] transition-colors">
                 {Array.from({ length: star }, (_, i) => (
                   <Star
                     key={i}
-                    className="w-3.5 h-3.5 fill-amber-400 text-amber-400"
+                    className="w-3.5 h-3.5 fill-[#F5A300] text-[#F5A300]"
                   />
                 ))}
-                <span className="ml-0.5">{star}+</span>
+                <span className="ml-1 font-bold">{star}+ Stars</span>
               </span>
             </label>
           ))}
-          <label className="flex items-center gap-2.5 cursor-pointer group">
+          <label className="flex items-center gap-2.5 cursor-pointer group py-0.5">
             <CustomRadio
               checked={filters.rating === null}
               onChange={() => setRating(null)}
             />
-            <span className="text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">
+            <span className="font-mono text-xs text-[#1C1A17] group-hover:text-[#F5A300] transition-colors">
               Any Rating
             </span>
           </label>
@@ -242,17 +244,17 @@ function FilterSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="border-b border-zinc-200 dark:border-zinc-700 pb-4">
+    <div className="border-b border-[#E7DCC4] pb-4">
       <button
         onClick={onToggle}
-        className="flex items-center justify-between w-full py-1 text-sm font-medium"
+        className="flex items-center justify-between w-full py-1 font-serif font-bold text-sm text-[#132A3A]"
       >
         {title}
         <motion.div
           animate={{ rotate: expanded ? 180 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          <ChevronDown className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
+          <ChevronDown className="w-4 h-4 text-[#F5A300]" />
         </motion.div>
       </button>
       <AnimatePresence initial={false}>
